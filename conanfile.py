@@ -23,14 +23,14 @@ import os
 required_conan_version = ">=1.50.0"
 
 
-class libhal___device___conan(ConanFile):
-    name = "libhal-__device__"
+class libhal_icm_conan(ConanFile):
+    name = "libhal-icm"
     version = "0.0.1"
     license = "Apache-2.0"
     url = "https://github.com/conan-io/conan-center-index"
-    homepage = "https://github.com/libhal/libhal-__device__"
-    description = ("A collection of drivers for the __device__")
-    topics = ("__device__", "libhal", "driver")
+    homepage = "https://github.com/libhal/libhal-icm"
+    description = ("A collection of drivers for the icm")
+    topics = ("icm", "libhal", "driver")
     settings = "compiler", "build_type", "os", "arch"
     exports_sources = ("include/*", "tests/*", "LICENSE", "CMakeLists.txt",
                        "src/*")
@@ -105,5 +105,5 @@ class libhal___device___conan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["libhal-__device__"]
-        self.cpp_info.set_property("cmake_target_name", "libhal::__device__")
+        self.cpp_info.libs = ["libhal-icm"]
+        self.cpp_info.set_property("cmake_target_name", "libhal::icm")

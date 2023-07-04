@@ -1,15 +1,15 @@
-# libhal-__device__
+# libhal-icm
 
-[![✅ Checks](https://github.com/libhal/libhal-__device__/actions/workflows/ci.yml/badge.svg)](https://github.com/libhal/libhal-__device__/actions/workflows/ci.yml)
-[![Coverage](https://libhal.github.io/libhal-__device__/coverage/coverage.svg)](https://libhal.github.io/libhal-__device__/coverage/)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b084e6d5962d49a9afcb275d62cd6586)](https://www.codacy.com/gh/libhal/libhal-__device__/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=libhal/libhal-__device__&amp;utm_campaign=Badge_Grade)
-[![GitHub stars](https://img.shields.io/github/stars/libhal/libhal-__device__.svg)](https://github.com/libhal/libhal-__device__/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/libhal/libhal-__device__.svg)](https://github.com/libhal/libhal-__device__/network)
-[![GitHub issues](https://img.shields.io/github/issues/libhal/libhal-__device__.svg)](https://github.com/libhal/libhal-__device__/issues)
-[![Latest Version](https://libhal.github.io/libhal-__device__/latest_version.svg)](https://github.com/libhal/libhal-__device__/blob/main/conanfile.py)
-[![ConanCenter Version](https://repology.org/badge/version-for-repo/conancenter/libhal-__device__.svg)](https://conan.io/center/libhal-__device__)
+[![✅ Checks](https://github.com/libhal/libhal-icm/actions/workflows/ci.yml/badge.svg)](https://github.com/libhal/libhal-icm/actions/workflows/ci.yml)
+[![Coverage](https://libhal.github.io/libhal-icm/coverage/coverage.svg)](https://libhal.github.io/libhal-icm/coverage/)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b084e6d5962d49a9afcb275d62cd6586)](https://www.codacy.com/gh/libhal/libhal-icm/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=libhal/libhal-icm&amp;utm_campaign=Badge_Grade)
+[![GitHub stars](https://img.shields.io/github/stars/libhal/libhal-icm.svg)](https://github.com/libhal/libhal-icm/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/libhal/libhal-icm.svg)](https://github.com/libhal/libhal-icm/network)
+[![GitHub issues](https://img.shields.io/github/issues/libhal/libhal-icm.svg)](https://github.com/libhal/libhal-icm/issues)
+[![Latest Version](https://libhal.github.io/libhal-icm/latest_version.svg)](https://github.com/libhal/libhal-icm/blob/main/conanfile.py)
+[![ConanCenter Version](https://repology.org/badge/version-for-repo/conancenter/libhal-icm.svg)](https://conan.io/center/libhal-icm)
 
-libhal compatible device library for the __device__ device.
+libhal compatible device library for the icm device.
 
 ## Contributing
 
