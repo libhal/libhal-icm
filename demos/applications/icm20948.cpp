@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "../hardware_map.hpp"
+#include <libhal-icm/icm20948.hpp>
 #include <libhal-util/serial.hpp>
 #include <libhal-util/steady_clock.hpp>
-
-#include "../hardware_map.hpp"
 
 hal::status application(hardware_map& p_map)
 {
@@ -24,13 +24,26 @@ hal::status application(hardware_map& p_map)
 
   auto& clock = *p_map.clock;
   auto& console = *p_map.console;
+  auto& i2c = *p_map.i2c;
+  hal::icm::icm20948_accelerometer icm_accel(i2c, 0x69);
 
-  hal::print(console, "Demo Application Starting...\n\n");
+  hal::print(console, "icm Application Starting...\n\n");
+  
+  // auto icm = HAL_CHECK(icm20948_accelerometer::init(i2c, 0x69));
+  // icm_accel.power_on();
 
   while (true) {
-    hal::delay(clock, 500ms);
-    hal::print(console, "Hello, world\n");
-  }
+    (void)hal::delay(clock, 500ms);
+    hal::print(console, "Reading IMU... \n");
 
+    (void)hal::delay(clock, 500ms);
+    auto acceleration = HAL_CHECK(icm_accel.read());
+
+    hal::print<128>(console,
+                    "Accelerometer: 2g \t x = %fg, y = %fg, z = %fg \n",
+                    acceleration.x,
+                    acceleration.y,
+                    acceleration.z);
+  }
   return hal::success();
 }

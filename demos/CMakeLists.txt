@@ -30,7 +30,7 @@ find_package(libhal-${platform_library} REQUIRED CONFIG)
 find_package(libhal-icm REQUIRED CONFIG)
 find_package(libhal-util REQUIRED CONFIG)
 
-set(DEMOS icm)
+set(DEMOS icm20948)
 
 add_library(startup_code
     main.cpp
@@ -46,6 +46,7 @@ foreach(demo IN LISTS DEMOS)
     set(current_project ${demo}.elf)
     message(STATUS "Generating Demo for \"${current_project}\"")
     add_executable(${current_project} applications/${demo}.cpp)
+    target_compile_options(${current_project} PRIVATE -g)
     target_include_directories(${current_project} PUBLIC .)
     target_compile_features(${current_project} PRIVATE cxx_std_20)
     target_link_libraries(${current_project} PRIVATE

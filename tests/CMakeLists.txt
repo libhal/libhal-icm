@@ -45,7 +45,8 @@ find_package(libhal-util REQUIRED CONFIG)
 find_package(libhal-mock REQUIRED CONFIG)
 
 add_executable(${PROJECT_NAME}
-  icm.test.cpp
+  # icm20xx.test.cpp
+  icm20948.test.cpp
   main.test.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC . ../include)

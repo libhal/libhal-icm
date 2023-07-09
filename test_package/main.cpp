@@ -19,11 +19,12 @@
 #include <cstdlib>
 #include <exception>
 
-#include <libhal-icm/icm.hpp>
+#include <libhal-icm/icm20948.hpp>
 
 int main()
 {
-  hal::icm::icm_replace_me bar;
+  // hal::icm::icm_replace_me bar;
+  return 0;
 }
 
 namespace boost {
