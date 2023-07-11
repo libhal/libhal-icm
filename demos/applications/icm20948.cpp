@@ -25,12 +25,11 @@ hal::status application(hardware_map& p_map)
   auto& clock = *p_map.clock;
   auto& console = *p_map.console;
   auto& i2c = *p_map.i2c;
-  hal::icm::icm20948_accelerometer icm_accel(i2c, 0x69);
 
   hal::print(console, "icm Application Starting...\n\n");
-  
-  // auto icm = HAL_CHECK(icm20948_accelerometer::init(i2c, 0x69));
-  // icm_accel.power_on();
+
+  auto icm_accel =
+    HAL_CHECK(hal::icm::icm20948_accelerometer::create(i2c, 0x69));
 
   while (true) {
     (void)hal::delay(clock, 500ms);

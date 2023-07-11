@@ -19,13 +19,9 @@
 #include <libhal-util/map.hpp>
 #include <libhal/accelerometer.hpp>
 
-// #include "icm20xx.hpp"
-
 namespace hal::icm {
-
 class icm20948_accelerometer : public accelerometer
 {
-
 public:
   hal::i2c* m_i2c;
   hal::byte m_address;
@@ -36,20 +32,23 @@ public:
   static constexpr hal::byte power_mgmt_2_register = 0x07;
   static constexpr hal::byte xyz_accel_register = 0x2D;
 
-  icm20948_accelerometer(hal::i2c& p_i2c, hal::byte p_device_address)
+  explicit constexpr icm20948_accelerometer(hal::i2c& p_i2c,
+                                            hal::byte p_device_address)
     : m_i2c(&p_i2c)
     , m_address(p_device_address)
   {
   }
 
-  result<icm20948_accelerometer> init(hal::i2c& p_i2c,
-                                             hal::byte p_device_address);
+  static result<icm20948_accelerometer> create(hal::i2c& p_i2c,
+                                               hal::byte p_device_address);
 
   [[nodiscard]] result<accelerometer::read_t> driver_read() override;
 
   hal::status is_valid_device();
 
   hal::status active_mode(bool p_is_active);
+
+  [[nodiscard]] hal::status configure_power_mgmt_2_register();
 
   [[nodiscard]] hal::status power_on();
 

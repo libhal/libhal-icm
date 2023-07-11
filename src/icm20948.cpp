@@ -17,7 +17,7 @@
 
 namespace hal::icm {
 
-result<icm20948_accelerometer> icm20948_accelerometer::init(
+result<icm20948_accelerometer> icm20948_accelerometer::create(
   hal::i2c& p_i2c,
   hal::byte p_device_address = address_default)
 {
@@ -100,9 +100,23 @@ hal::status icm20948_accelerometer::active_mode(bool p_is_active = true)
   return hal::success();
 }
 
+[[nodiscard]] hal::status
+icm20948_accelerometer::configure_power_mgmt_2_register()
+{
+  constexpr hal::byte power_mgmt_2_config = 0x00;
+
+  // Write the configuration value to the power_mgmt_2_register
+  HAL_CHECK(hal::write(*m_i2c,
+                       m_address,
+                       std::array{ power_mgmt_2_register, power_mgmt_2_config },
+                       hal::never_timeout()));
+  return hal::success();
+}
+
 [[nodiscard]] hal::status icm20948_accelerometer::power_on()
 {
   HAL_CHECK(is_valid_device());
+  HAL_CHECK(configure_power_mgmt_2_register());
   return active_mode(true);
 }
 
