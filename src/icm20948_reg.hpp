@@ -1,9 +1,24 @@
-
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <libhal-util/bit.hpp>
+#include <libhal/units.hpp>
 
 namespace hal::icm {
 
+
+static constexpr hal::byte ICM20948_ADDRESS = 0x69;
 static constexpr hal::byte AK09916_ADDRESS = 0x0C;
 
 /* Registers ICM20948 USER BANK 0*/
@@ -124,8 +139,8 @@ static constexpr hal::byte AK09916_READ = 0x80;
 static constexpr hal::byte AK09916_WHO_AM_I_1 = 0x4809;
 static constexpr hal::byte AK09916_WHO_AM_I_2 = 0x0948;
 static constexpr hal::byte ICM20948_WHO_AM_I_CONTENT = 0xEA;
-static constexpr float ICM20948_ROOM_TEMP_OFFSET{ 0.0 };
-static constexpr float ICM20948_T_SENSITIVITY{ 333.87 };
-static constexpr float AK09916_MAG_LSB{ 0.1495 };
+static constexpr float ICM20948_ROOM_TEMP_OFFSET = { 0.0 };
+static constexpr float ICM20948_T_SENSITIVITY = { 333.87 };
+static constexpr float AK09916_MAG_LSB = { 0.1495 };
 
 }  // namespace hal::icm

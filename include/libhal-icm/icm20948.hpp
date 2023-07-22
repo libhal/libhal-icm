@@ -16,9 +16,9 @@
 
 #include <libhal-icm/xyzFloat.hpp>
 #include <libhal-util/bit.hpp>
+#include <libhal/i2c.hpp>
 #include <libhal-util/i2c.hpp>
 #include <libhal-util/map.hpp>
-#include <libhal/accelerometer.hpp>
 
 namespace hal::icm {
 
@@ -26,107 +26,14 @@ class icm20948
 {
 
 public:
-  explicit constexpr icm20948(hal::i2c& p_i2c, hal::byte p_device_address)
+  explicit icm20948(hal::i2c& p_i2c, hal::byte p_device_address)
     : m_i2c(&p_i2c)
     , m_address(p_device_address)
   {
   }
 
-  /* Basic settings */
-
-  bool init();
-  void autoOffsets();
-  void setAccOffsets(float xMin,
-                     float xMax,
-                     float yMin,
-                     float yMax,
-                     float zMin,
-                     float zMax);
-  void setGyrOffsets(float xOffset, float yOffset, float zOffset);
-  uint8_t whoAmI();
-  void enableAcc(bool enAcc);
-  void setAccRange(ICM20948_accRange accRange);
-  void setAccDLPF(ICM20948_dlpf dlpf);
-  void setAccSampleRateDivider(uint16_t accSplRateDiv);
-  void enableGyr(bool enGyr);
-  void setGyrRange(ICM20948_gyroRange gyroRange);
-  void setGyrDLPF(ICM20948_dlpf dlpf);
-  void setGyrSampleRateDivider(uint8_t gyrSplRateDiv);
-  void setTempDLPF(ICM20948_dlpf dlpf);
-
-  /* x,y,z results */
-
-  void readSensor();
-  xyzFloat getAccRawValues();
-  xyzFloat getCorrectedAccRawValues();
-  xyzFloat getGValues();
-  xyzFloat getAccRawValuesFromFifo();
-  xyzFloat getCorrectedAccRawValuesFromFifo();
-  xyzFloat getGValuesFromFifo();
-  float getResultantG(xyzFloat gVal);
-  float getTemperature();
-  xyzFloat getGyrRawValues();
-  xyzFloat getCorrectedGyrRawValues();
-  xyzFloat getGyrValues();
-  xyzFloat getGyrValuesFromFifo();
-  xyzFloat getMagValues();
-
-  /* Angles and Orientation */
-
-  xyzFloat getAngles();
-  ICM20948_orientation getOrientation();
-  std::string getOrientationAsString();
-  float getPitch();
-  float getRoll();
-
-  /* Power, Sleep, Standby */
-
-  void enableCycle(ICM20948_cycle cycle);
-  void enableLowPower(bool enLP);
-  void setGyrAverageInCycleMode(ICM20948_gyroAvgLowPower avg);
-  void setAccAverageInCycleMode(ICM20948_accAvgLowPower avg);
-  void sleep(bool sleep);
-
-  /* Magnetometer */
-
-  bool initMagnetometer();
-  uint16_t whoAmIMag();
-  void setMagOpMode(AK09916_opMode opMode);
-  void resetMag();
-
-private:
-  hal::i2c* m_i2c;
-  hal::byte m_address;
-  hal::byte m_gscale = 0x00;
-
-  uint8_t currentBank;
-  std::array<hal::byte, 20> buffer {};
-  xyzFloat accOffsetVal;
-  xyzFloat accCorrFactor;
-  xyzFloat gyrOffsetVal;
-  uint8_t accRangeFactor;
-  uint8_t gyrRangeFactor;
-  uint8_t regVal;  // intermediate storage of register values
-
-  void setClockToAutoSelect();
-  xyzFloat correctAccRawValues(xyzFloat accRawVal);
-  xyzFloat correctGyrRawValues(xyzFloat gyrRawVal);
-  void switchBank(uint8_t newBank);
-  void writeRegister8(uint8_t bank, uint8_t reg, uint8_t val);
-  void writeRegister16(uint8_t bank, uint8_t reg, int16_t val);
-
-  uint8_t readRegister8(uint8_t bank, uint8_t reg);
-  int16_t readRegister16(uint8_t bank, uint8_t reg);
-
-  void readAllData(uint8_t* data);
-  void writeAK09916Register8(uint8_t reg, uint8_t val);
-  uint8_t readAK09916Register8(uint8_t reg);
-  int16_t readAK09916Register16(uint8_t reg);
-
-  void reset_ICM20948();
-  void enableI2CMaster();
-
-  void enableMagDataRead(uint8_t reg, uint8_t bytes);
+  result<icm20948> create(hal::i2c& p_i2c,
+                                  hal::byte p_device_address);
 
   typedef enum ICM20948_CYCLE
   {
@@ -240,6 +147,102 @@ private:
     ICM20948_YX,
     ICM20948_YX_1
   } ICM20948_orientation;
+
+  /* Basic settings */
+
+  hal::status init();
+  void autoOffsets();
+  void setAccOffsets(float xMin,
+                     float xMax,
+                     float yMin,
+                     float yMax,
+                     float zMin,
+                     float zMax);
+  void setGyrOffsets(float xOffset, float yOffset, float zOffset);
+  hal::byte whoAmI();
+  void enableAcc(bool enAcc);
+  void setAccRange(ICM20948_accRange accRange);
+  void setAccDLPF(ICM20948_dlpf dlpf);
+  void setAccSampleRateDivider(uint16_t accSplRateDiv);
+  void enableGyr(bool enGyr);
+  void setGyrRange(ICM20948_gyroRange gyroRange);
+  void setGyrDLPF(ICM20948_dlpf dlpf);
+  void setGyrSampleRateDivider(hal::byte gyrSplRateDiv);
+  void setTempDLPF(ICM20948_dlpf dlpf);
+
+  /* x,y,z results */
+
+  void readSensor();
+  xyzFloat getAccRawValues();
+  xyzFloat getCorrectedAccRawValues();
+  xyzFloat getGValues();
+  xyzFloat getAccRawValuesFromFifo();
+  xyzFloat getCorrectedAccRawValuesFromFifo();
+  xyzFloat getGValuesFromFifo();
+  float getResultantG(xyzFloat gVal);
+  float getTemperature();
+  xyzFloat getGyrRawValues();
+  xyzFloat getCorrectedGyrRawValues();
+  xyzFloat getGyrValues();
+  xyzFloat getGyrValuesFromFifo();
+  xyzFloat getMagValues();
+
+  /* Power, Sleep, Standby */
+
+  void enableCycle(ICM20948_cycle cycle);
+  void enableLowPower(bool enLP);
+  void setGyrAverageInCycleMode(ICM20948_gyroAvgLowPower avg);
+  void setAccAverageInCycleMode(ICM20948_accAvgLowPower avg);
+  void sleep(bool sleep);
+
+  /* Angles and Orientation */
+
+  // xyzFloat getAngles();
+  // ICM20948_orientation getOrientation();
+  // std::string getOrientationAsString();
+  // float getPitch();
+  // float getRoll();
+
+  /* Magnetometer */
+
+  bool initMagnetometer();
+  uint16_t whoAmIMag();
+  void setMagOpMode(AK09916_opMode opMode);
+  void resetMag();
+
+private:
+  hal::i2c* m_i2c;
+  hal::byte m_address;
+  hal::byte m_gscale = 0x00;
+
+  hal::byte currentBank;
+  std::array<hal::byte, 20> m_read_all_buffer {};
+  xyzFloat accOffsetVal;
+  xyzFloat accCorrFactor;
+  xyzFloat gyrOffsetVal;
+  hal::byte accRangeFactor;
+  hal::byte gyrRangeFactor;
+  hal::byte regVal;  // intermediate storage of register values
+
+  void setClockToAutoSelect();
+  xyzFloat correctAccRawValues(xyzFloat accRawVal);
+  xyzFloat correctGyrRawValues(xyzFloat gyrRawVal);
+  void switchBank(hal::byte newBank);
+  void writeRegister8(hal::byte bank, hal::byte reg, hal::byte val);
+  void writeRegister16(hal::byte bank, hal::byte reg, int16_t val);
+
+  std::array<hal::byte> readRegister8(hal::byte bank, hal::byte reg);
+  int16_t readRegister16(hal::byte bank, hal::byte reg);
+
+  void readAllData(hal::byte data);
+  void writeAK09916Register8(hal::byte reg, hal::byte val);
+  hal::byte readAK09916Register8(hal::byte reg);
+  int16_t readAK09916Register16(hal::byte reg);
+
+  void reset_ICM20948();
+  void enableI2CMaster();
+
+  void enableMagDataRead(hal::byte reg, hal::byte bytes);
 };
 
 }  // namespace hal::icm
