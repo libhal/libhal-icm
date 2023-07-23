@@ -14,6 +14,7 @@
 
 #include "../hardware_map.hpp"
 #include <libhal-icm/icm20948.hpp>
+#include <libhal-icm/xyzFloat.hpp>
 #include <libhal-util/serial.hpp>
 #include <libhal-util/steady_clock.hpp>
 
