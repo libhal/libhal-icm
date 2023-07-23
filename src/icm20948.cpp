@@ -31,9 +31,8 @@ result<icm20948> icm20948::create(hal::i2c& p_i2c,
 {
   icm20948 icm(p_i2c, p_device_address);
 
-  if (!icm.init()) {
-    return hal::new_error();
-  }
+  HAL_CHECK(icm.init());
+
   return icm;
 }
 
@@ -43,7 +42,7 @@ hal::status icm20948::init()
 {
   currentBank = 0;
   reset_ICM20948();
-  if (whoAmI() != ICM20948_WHO_AM_I_CONTENT) {
+  if (HAL_CHECK(whoAmI()) != ICM20948_WHO_AM_I_CONTENT) {
     return hal::new_error();
   }
 
@@ -64,7 +63,7 @@ hal::status icm20948::init()
   return hal::success();
 }
 
-void icm20948::autoOffsets()
+hal::status icm20948::autoOffsets()
 {
   xyzFloat accRawVal, gyrRawVal;
   accOffsetVal.x = 0.0;
@@ -103,9 +102,11 @@ void icm20948::autoOffsets()
   gyrOffsetVal.x /= 50;
   gyrOffsetVal.y /= 50;
   gyrOffsetVal.z /= 50;
+
+  return hal::success();
 }
 
-void icm20948::setAccOffsets(float xMin,
+hal::status icm20948::setAccOffsets(float xMin,
                              float xMax,
                              float yMin,
                              float yMax,
@@ -118,104 +119,123 @@ void icm20948::setAccOffsets(float xMin,
   accCorrFactor.x = (xMax + abs(xMin)) / 32768.0;
   accCorrFactor.y = (yMax + abs(yMin)) / 32768.0;
   accCorrFactor.z = (zMax + abs(zMin)) / 32768.0;
+
+  return hal::success();
 }
 
-void icm20948::setGyrOffsets(float xOffset, float yOffset, float zOffset)
+hal::status icm20948::setGyrOffsets(float xOffset, float yOffset, float zOffset)
 {
   gyrOffsetVal.x = xOffset;
   gyrOffsetVal.y = yOffset;
   gyrOffsetVal.z = zOffset;
+
+  return hal::success();
 }
 
-hal::byte icm20948::whoAmI()
+hal::result<hal::byte> icm20948::whoAmI()
 {
-  return readRegister8(0, ICM20948_WHO_AM_I);
+  return HAL_CHECK(readRegister8(0, ICM20948_WHO_AM_I));
 }
 
-void icm20948::enableAcc(bool enAcc)
+hal::status icm20948::enableAcc(bool enAcc)
 {
-  regVal = readRegister8(0, ICM20948_PWR_MGMT_2);
+  regVal = HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_2));
 
   if (enAcc) {
     regVal &= ~ICM20948_ACC_EN;
   } else {
     regVal |= ICM20948_ACC_EN;
   }
-  writeRegister8(0, ICM20948_PWR_MGMT_2, regVal);
+  HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_2, regVal));
+
+  return hal::success();
 }
 
-void icm20948::setAccRange(ICM20948_accRange accRange)
+hal::status icm20948::setAccRange(ICM20948_accRange accRange)
 {
-  regVal = readRegister8(2, ICM20948_ACCEL_CONFIG);
+  regVal = HAL_CHECK(readRegister8(2, ICM20948_ACCEL_CONFIG));
   regVal &= ~(0x06);
   regVal |= (accRange << 1);
-  writeRegister8(2, ICM20948_ACCEL_CONFIG, regVal);
+  HAL_CHECK(writeRegister8(2, ICM20948_ACCEL_CONFIG, regVal));
+
+  return hal::success();
 }
 
-void icm20948::setAccDLPF(ICM20948_dlpf dlpf)
+hal::status icm20948::setAccDLPF(ICM20948_dlpf dlpf)
 {
-  regVal = readRegister8(2, ICM20948_ACCEL_CONFIG);
+  regVal = HAL_CHECK(readRegister8(2, ICM20948_ACCEL_CONFIG));
 
   if (dlpf == ICM20948_DLPF_OFF) {
     regVal &= 0xFE;
-    writeRegister8(2, ICM20948_ACCEL_CONFIG, regVal);
-    return;
+    HAL_CHECK(writeRegister8(2, ICM20948_ACCEL_CONFIG, regVal));
+    return hal::success();
   } else {
     regVal |= 0x01;
     regVal &= 0xC7;
     regVal |= (dlpf << 3);
   }
-  writeRegister8(2, ICM20948_ACCEL_CONFIG, regVal);
+  HAL_CHECK(writeRegister8(2, ICM20948_ACCEL_CONFIG, regVal));
+
+  return hal::success();
 }
 
-void icm20948::setAccSampleRateDivider(uint16_t accSplRateDiv)
+hal::status icm20948::setAccSampleRateDivider(uint16_t accSplRateDiv)
 {
-  writeRegister16(2, ICM20948_ACCEL_SMPLRT_DIV_1, accSplRateDiv);
+  HAL_CHECK(writeRegister16(2, ICM20948_ACCEL_SMPLRT_DIV_1, accSplRateDiv));
+  return hal::success();
 }
 
-void icm20948::enableGyr(bool enGyr)
+hal::status icm20948::enableGyr(bool enGyr)
 {
-  regVal = readRegister8(0, ICM20948_PWR_MGMT_2);
+  regVal = HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_2));
   if (enGyr) {
     regVal &= ~ICM20948_GYR_EN;
   } else {
     regVal |= ICM20948_GYR_EN;
   }
-  writeRegister8(0, ICM20948_PWR_MGMT_2, regVal);
+  HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_2, regVal));
+
+  return hal::success();
 }
 
-void icm20948::setGyrRange(ICM20948_gyroRange gyroRange)
+hal::status icm20948::setGyrRange(ICM20948_gyroRange gyroRange)
 {
-  regVal = readRegister8(2, ICM20948_GYRO_CONFIG_1);
+  regVal = HAL_CHECK(readRegister8(2, ICM20948_GYRO_CONFIG_1));
   regVal &= ~(0x06);
   regVal |= (gyroRange << 1);
-  writeRegister8(2, ICM20948_GYRO_CONFIG_1, regVal);
+  HAL_CHECK(writeRegister8(2, ICM20948_GYRO_CONFIG_1, regVal));
+
+  return hal::success();
 }
 
-void icm20948::setGyrDLPF(ICM20948_dlpf dlpf)
+hal::status icm20948::setGyrDLPF(ICM20948_dlpf dlpf)
 {
-  regVal = readRegister8(2, ICM20948_GYRO_CONFIG_1);
+  regVal = HAL_CHECK(readRegister8(2, ICM20948_GYRO_CONFIG_1));
 
   if (dlpf == ICM20948_DLPF_OFF) {
     regVal &= 0xFE;
-    writeRegister8(2, ICM20948_GYRO_CONFIG_1, regVal);
-    return;
+    HAL_CHECK(writeRegister8(2, ICM20948_GYRO_CONFIG_1, regVal));
+    return hal::success();
   } else {
     regVal |= 0x01;
     regVal &= 0xC7;
     regVal |= (dlpf << 3);
   }
-  writeRegister8(2, ICM20948_GYRO_CONFIG_1, regVal);
+  HAL_CHECK(writeRegister8(2, ICM20948_GYRO_CONFIG_1, regVal));
+
+  return hal::success();
 }
 
-void icm20948::setGyrSampleRateDivider(hal::byte gyrSplRateDiv)
+hal::status icm20948::setGyrSampleRateDivider(hal::byte gyrSplRateDiv)
 {
-  writeRegister8(2, ICM20948_GYRO_SMPLRT_DIV, gyrSplRateDiv);
+  HAL_CHECK(writeRegister8(2, ICM20948_GYRO_SMPLRT_DIV, gyrSplRateDiv));
+  return hal::success();
 }
 
-void icm20948::setTempDLPF(ICM20948_dlpf dlpf)
+hal::status icm20948::setTempDLPF(ICM20948_dlpf dlpf)
 {
-  writeRegister8(2, ICM20948_TEMP_CONFIG, dlpf);
+  HAL_CHECK(writeRegister8(2, ICM20948_TEMP_CONFIG, dlpf));
+  return hal::success();
 }
 
 // void icm20948::setI2CMstSampleRate(hal::byte rateExp)
@@ -229,9 +249,10 @@ void icm20948::setTempDLPF(ICM20948_dlpf dlpf)
 
 /************* x,y,z results *************/
 
-void icm20948::readSensor()
+hal::status icm20948::readSensor()
 {
-  readAllData(m_read_all_buffer);
+  HAL_CHECK(readAllData(m_read_all_buffer));
+  return hal::success();
 }
 
 xyzFloat icm20948::getAccRawValues()
@@ -317,46 +338,52 @@ xyzFloat icm20948::getMagValues()
 
 /********* Power, Sleep, Standby *********/
 
-void icm20948::enableCycle(ICM20948_cycle cycle)
+hal::status icm20948::enableCycle(ICM20948_cycle cycle)
 {
-  regVal = readRegister8(0, ICM20948_LP_CONFIG);
+  regVal = HAL_CHECK(readRegister8(0, ICM20948_LP_CONFIG));
   regVal &= 0x0F;
   regVal |= cycle;
 
-  writeRegister8(0, ICM20948_LP_CONFIG, regVal);
+  HAL_CHECK(writeRegister8(0, ICM20948_LP_CONFIG, regVal));
+  return hal::success();
 }
 
-void icm20948::enableLowPower(bool enLP)
+hal::status icm20948::enableLowPower(bool enLP)
 {
-  regVal = readRegister8(0, ICM20948_PWR_MGMT_1);
+  regVal = HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_1));
   if (enLP) {
     regVal |= ICM20948_LP_EN;
   } else {
     regVal &= ~ICM20948_LP_EN;
   }
-  writeRegister8(0, ICM20948_PWR_MGMT_1, regVal);
+  HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_1, regVal));
+  return hal::success();
 }
 
-void icm20948::setGyrAverageInCycleMode(ICM20948_gyroAvgLowPower avg)
+hal::status icm20948::setGyrAverageInCycleMode(ICM20948_gyroAvgLowPower avg)
 {
-  writeRegister8(2, ICM20948_GYRO_CONFIG_2, avg);
+  HAL_CHECK(writeRegister8(2, ICM20948_GYRO_CONFIG_2, avg));
+  return hal::success();
 }
 
-void icm20948::setAccAverageInCycleMode(ICM20948_accAvgLowPower avg)
+hal::status icm20948::setAccAverageInCycleMode(ICM20948_accAvgLowPower avg)
 {
-  writeRegister8(2, ICM20948_ACCEL_CONFIG_2, avg);
+  HAL_CHECK(writeRegister8(2, ICM20948_ACCEL_CONFIG_2, avg));
+  return hal::success();
 }
 
-void icm20948::sleep(bool sleep)
+hal::status icm20948::sleep(bool sleep)
 {
-  regVal = readRegister8(0, ICM20948_PWR_MGMT_1);
+  regVal = HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_1));
 
   if (sleep) {
     regVal |= ICM20948_SLEEP;
   } else {
     regVal &= ~ICM20948_SLEEP;
   }
-  writeRegister8(0, ICM20948_PWR_MGMT_1, regVal);
+  HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_1, regVal));
+
+  return hal::success();
 }
 
 /******** Angles and Orientation *********/
@@ -464,7 +491,7 @@ void icm20948::sleep(bool sleep)
 
 /************** Magnetometer **************/
 
-bool icm20948::initMagnetometer()
+hal::status icm20948::initMagnetometer()
 {
   enableI2CMaster();
   resetMag();
@@ -474,18 +501,18 @@ bool icm20948::initMagnetometer()
   enableI2CMaster();
   // //delay(10);
 
-  int16_t whoAmI = whoAmIMag();
+  int16_t whoAmI = HAL_CHECK(whoAmIMag());
   if (!((whoAmI == AK09916_WHO_AM_I_1) || (whoAmI == AK09916_WHO_AM_I_2))) {
-    return false;
+    return hal::new_error();
   }
   setMagOpMode(AK09916_CONT_MODE_100HZ);
 
-  return true;
+  return hal::success();
 }
 
-uint16_t icm20948::whoAmIMag()
+hal::result<uint16_t> icm20948::whoAmIMag()
 {
-  return static_cast<uint16_t>(readAK09916Register16(AK09916_WIA_1));
+  return static_cast<uint16_t>(HAL_CHECK(readAK09916Register16(AK09916_WIA_1)));
 }
 
 void icm20948::setMagOpMode(AK09916_opMode opMode)
@@ -508,11 +535,12 @@ void icm20948::resetMag()
      Private Functions
 *************************************************/
 
-void icm20948::setClockToAutoSelect()
+hal::status icm20948::setClockToAutoSelect()
 {
-  regVal = icm20948::readRegister8(0, ICM20948_PWR_MGMT_1);
+  regVal = HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_1));
   regVal |= 0x01;
-  writeRegister8(0, ICM20948_PWR_MGMT_1, regVal);
+  HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_1, regVal));
+  return hal::success();
   // delay(10);
 }
 
@@ -540,7 +568,7 @@ xyzFloat icm20948::correctGyrRawValues(xyzFloat gyrRawVal)
 
 
 
-void icm20948::switchBank(hal::byte newBank)
+hal::status icm20948::switchBank(hal::byte newBank)
 {
   if (newBank != currentBank) {
     currentBank = newBank;
@@ -557,9 +585,11 @@ void icm20948::switchBank(hal::byte newBank)
     // _wire->write(currentBank << 4);
     // _wire->endTransmission();
   }
+
+  return hal::success();
 }
 
-void icm20948::writeRegister8(hal::byte bank, hal::byte reg, hal::byte val)
+hal::status icm20948::writeRegister8(hal::byte bank, hal::byte reg, hal::byte val)
 {
   switchBank(bank);
 
@@ -573,9 +603,11 @@ void icm20948::writeRegister8(hal::byte bank, hal::byte reg, hal::byte val)
   // _wire->write(reg);
   // _wire->write(val);
   // _wire->endTransmission();
+
+  return hal::success();
 }
 
-void icm20948::writeRegister16(hal::byte bank, hal::byte reg, int16_t val)
+hal::status icm20948::writeRegister16(hal::byte bank, hal::byte reg, int16_t val)
 {
   switchBank(bank);
   int8_t MSByte = static_cast<int8_t>((val >> 8) & 0xFF);
@@ -594,9 +626,11 @@ void icm20948::writeRegister16(hal::byte bank, hal::byte reg, int16_t val)
   // _wire->write(MSByte);
   // _wire->write(LSByte);
   // _wire->endTransmission();
+
+  return hal::success();
 }
 
-std::array<hal::byte> readRegister8(hal::byte bank, hal::byte reg)
+hal::result<hal::byte> icm20948::readRegister8(hal::byte bank, hal::byte reg)
 {
   switchBank(bank);
   // hal::byte regValue = 0;
@@ -611,10 +645,10 @@ std::array<hal::byte> readRegister8(hal::byte bank, hal::byte reg)
   // _wire->requestFrom(m_address, static_cast<hal::byte>(1));
   // regValue = _wire->read();
   // return regValue;
-  return ctrl_buffer;
+  return ctrl_buffer[0];
 }
 
-int16_t icm20948::readRegister16(hal::byte bank, hal::byte reg)
+hal::result<int16_t> icm20948::readRegister16(hal::byte bank, hal::byte reg)
 {
 
   switchBank(bank);
@@ -637,13 +671,12 @@ int16_t icm20948::readRegister16(hal::byte bank, hal::byte reg)
   return reg16Val;
 }
 
-void icm20948::readAllData(hal::byte data)
+hal::status icm20948::readAllData(std::array<hal::byte, 20> data)
 {
   switchBank(0);
   // std::array<hal::byte, 20> read_buffer;
-  std::array<hal::byte, 1> reg_data { data };
   std::array<hal::byte, 1> reg = {ICM20948_ACCEL_OUT};
-  HAL_CHECK(hal::write_then_read(*m_i2c, m_address, reg, reg_data, hal::never_timeout()));
+  HAL_CHECK(hal::write_then_read(*m_i2c, m_address, reg, data, hal::never_timeout()));
 
   // _wire->beginTransmission(m_address);
   // _wire->write(ICM20948_ACCEL_OUT);
@@ -652,58 +685,58 @@ void icm20948::readAllData(hal::byte data)
   //   for (int i = 0; i < 20; i++) {
   //     data[i] = _wire->read();
   //   }
-
+  return hal::success();
 }
 
-void icm20948::writeAK09916Register8(hal::byte reg, hal::byte val)
+hal::status icm20948::writeAK09916Register8(hal::byte reg, hal::byte val)
 {
   writeRegister8(3, ICM20948_I2C_SLV0_ADDR, AK09916_ADDRESS);  // write AK09916
   writeRegister8(
     3, ICM20948_I2C_SLV0_REG, reg);  // define AK09916 register to be written to
   writeRegister8(3, ICM20948_I2C_SLV0_DO, val);
+
+  return hal::success();
 }
 
-hal::byte icm20948::readAK09916Register8(hal::byte reg)
+hal::result<hal::byte> icm20948::readAK09916Register8(hal::byte reg)
 {
   enableMagDataRead(reg, 0x01);
   enableMagDataRead(AK09916_HXL, 0x08);
-  regVal = readRegister8(0, ICM20948_EXT_SLV_SENS_DATA_00);
+  regVal = HAL_CHECK(readRegister8(0, ICM20948_EXT_SLV_SENS_DATA_00));
   return regVal;
 }
 
-int16_t icm20948::readAK09916Register16(hal::byte reg)
+hal::result<int16_t> icm20948::readAK09916Register16(hal::byte reg)
 {
   int16_t regValue = 0;
   enableMagDataRead(reg, 0x02);
-  regValue = readRegister16(0, ICM20948_EXT_SLV_SENS_DATA_00);
+  regValue = HAL_CHECK(readRegister16(0, ICM20948_EXT_SLV_SENS_DATA_00));
   enableMagDataRead(AK09916_HXL, 0x08);
   return regValue;
 }
 
-void icm20948::reset_ICM20948()
+hal::status icm20948::reset_ICM20948()
 {
-  writeRegister8(0, ICM20948_PWR_MGMT_1, ICM20948_RESET);
+  HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_1, ICM20948_RESET));
   // delay(10);  // wait for registers to reset
+  return hal::success();
 }
 
-void icm20948::enableI2CMaster()
+hal::status icm20948::enableI2CMaster()
 {
-  writeRegister8(
-    0, ICM20948_USER_CTRL, ICM20948_I2C_MST_EN);  // enable I2C master
-  writeRegister8(
-    3, ICM20948_I2C_MST_CTRL, 0x07);  // set I2C clock to 345.60 kHz
+  HAL_CHECK(writeRegister8(0, ICM20948_USER_CTRL, ICM20948_I2C_MST_EN));  // enable I2C master
+  HAL_CHECK(writeRegister8(3, ICM20948_I2C_MST_CTRL, 0x07));  // set I2C clock to 345.60 kHz
   // delay(10);
+  return hal::success();
 }
 
-void icm20948::enableMagDataRead(hal::byte reg, hal::byte bytes)
+hal::status icm20948::enableMagDataRead(hal::byte reg, hal::byte bytes)
 {
-  writeRegister8(
-    3, ICM20948_I2C_SLV0_ADDR, AK09916_ADDRESS | AK09916_READ);  // read AK09916
-  writeRegister8(
-    3, ICM20948_I2C_SLV0_REG, reg);  // define AK09916 register to be read
-  writeRegister8(
-    3, ICM20948_I2C_SLV0_CTRL, 0x80 | bytes);  // enable read | number of byte
+  HAL_CHECK(writeRegister8(3, ICM20948_I2C_SLV0_ADDR, AK09916_ADDRESS | AK09916_READ));  // read AK09916
+  HAL_CHECK(writeRegister8(3, ICM20948_I2C_SLV0_REG, reg));  // define AK09916 register to be read
+  HAL_CHECK(writeRegister8(3, ICM20948_I2C_SLV0_CTRL, 0x80 | bytes));  // enable read | number of byte
   // delay(10);
+  return hal::success();
 }
 
 }  // namespace hal::icm

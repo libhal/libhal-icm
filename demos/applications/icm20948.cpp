@@ -29,14 +29,15 @@ hal::status application(hardware_map& p_map)
   hal::print(console, "icm Application Starting...\n\n");
 
   auto icm_accel =
-    HAL_CHECK(hal::icm::icm20948_accelerometer::create(i2c, 0x69));
+    HAL_CHECK(hal::icm::icm20948::create(i2c, 0x69));
 
   while (true) {
     (void)hal::delay(clock, 500ms);
     hal::print(console, "Reading IMU... \n");
 
     (void)hal::delay(clock, 500ms);
-    auto acceleration = HAL_CHECK(icm_accel.read());
+    HAL_CHECK(icm_accel.readSensor());
+    auto acceleration = icm_accel.getAccRawValues();
 
     hal::print<128>(console,
                     "Accelerometer: 2g \t x = %fg, y = %fg, z = %fg \n",

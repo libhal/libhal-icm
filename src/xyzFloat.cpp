@@ -16,11 +16,8 @@
 
 namespace hal::icm {
 
-xyzFloat::xyzFloat()
-    : xyzFloat(0.f, 0.f, 0.f)
-{
-    // intentionally empty
-}
+
+xyzFloat::xyzFloat(): x(0.f), y(0.f), z(0.f) {}
 
 xyzFloat::xyzFloat(float const x, float const y, float const z)
     : x(x)

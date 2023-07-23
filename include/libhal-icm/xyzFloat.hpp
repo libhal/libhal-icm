@@ -17,7 +17,9 @@
 
 namespace hal::icm {
 
-struct xyzFloat {
+class xyzFloat 
+{
+public:
     float x;
     float y;
     float z;
