@@ -26,18 +26,8 @@ class icm20948
 
 public:
 
-
-
-
   static result<icm20948> create(hal::i2c& p_i2c,
                                   hal::byte p_device_address);
-
-  struct accel_data_t{
-    float x = 0.0;
-    float y = 0.0;
-    float z = 0.0;
-  };
-
 
   typedef enum ICM20948_CYCLE
   {
@@ -184,7 +174,7 @@ public:
   /* x,y,z results */
 
   hal::status readSensor();
-  hal::result<accel_data_t> getAccRawValues();
+  xyzFloat getAccRawValues();
   xyzFloat getCorrectedAccRawValues();
   xyzFloat getGValues();
   xyzFloat getAccRawValuesFromFifo();

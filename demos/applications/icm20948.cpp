@@ -68,10 +68,8 @@ hal::status application(hardware_map& p_map)
     
 
     (void)hal::delay(clock, 500ms);
-    // HAL_CHECK(icm_accel.readSensor());
-    auto accelerations = icm_accel.getAccRawValues();
-    auto acceleration = *accelerations;
-    // hal::icm::icm20948::accel_data_t acceleration;
+    HAL_CHECK(icm_accel.readSensor());
+    auto acceleration = icm_accel.getAccRawValues();
     hal::print<128>(console,
                     "Accelerometer: x = %fg, y = %fg, z = %fg",
                     acceleration.x,

@@ -67,65 +67,65 @@ hal::status icm20948::init()
   return hal::success();
 }
 
-// hal::status icm20948::autoOffsets()
-// {
-//   xyzFloat accRawVal, gyrRawVal;
-//   accOffsetVal.x = 0.0;
-//   accOffsetVal.y = 0.0;
-//   accOffsetVal.z = 0.0;
+hal::status icm20948::autoOffsets()
+{
+  xyzFloat accRawVal, gyrRawVal;
+  accOffsetVal.x = 0.0;
+  accOffsetVal.y = 0.0;
+  accOffsetVal.z = 0.0;
 
-//   setGyrDLPF(ICM20948_DLPF_6);           // lowest noise
-//   setGyrRange(ICM20948_GYRO_RANGE_250);  // highest resolution
-//   setAccRange(ICM20948_ACC_RANGE_2G);
-//   setAccDLPF(ICM20948_DLPF_6);
-//   // delay(100);
+  setGyrDLPF(ICM20948_DLPF_6);           // lowest noise
+  setGyrRange(ICM20948_GYRO_RANGE_250);  // highest resolution
+  setAccRange(ICM20948_ACC_RANGE_2G);
+  setAccDLPF(ICM20948_DLPF_6);
+  // delay(100);
 
-//   for (int i = 0; i < 50; i++) {
-//     readSensor();
-//     accRawVal = getAccRawValues();
-//     accOffsetVal.x += accRawVal.x;
-//     accOffsetVal.y += accRawVal.y;
-//     accOffsetVal.z += accRawVal.z;
-//     // delay(10);
-//   }
+  for (int i = 0; i < 50; i++) {
+    readSensor();
+    accRawVal = getAccRawValues();
+    accOffsetVal.x += accRawVal.x;
+    accOffsetVal.y += accRawVal.y;
+    accOffsetVal.z += accRawVal.z;
+    // delay(10);
+  }
 
-//   accOffsetVal.x /= 50;
-//   accOffsetVal.y /= 50;
-//   accOffsetVal.z /= 50;
-//   accOffsetVal.z -= 16384.0;
+  accOffsetVal.x /= 50;
+  accOffsetVal.y /= 50;
+  accOffsetVal.z /= 50;
+  accOffsetVal.z -= 16384.0;
 
-//   for (int i = 0; i < 50; i++) {
-//     readSensor();
-//     gyrRawVal = getGyrRawValues();
-//     gyrOffsetVal.x += gyrRawVal.x;
-//     gyrOffsetVal.y += gyrRawVal.y;
-//     gyrOffsetVal.z += gyrRawVal.z;
-//     // delay(1);
-//   }
+  for (int i = 0; i < 50; i++) {
+    readSensor();
+    gyrRawVal = getGyrRawValues();
+    gyrOffsetVal.x += gyrRawVal.x;
+    gyrOffsetVal.y += gyrRawVal.y;
+    gyrOffsetVal.z += gyrRawVal.z;
+    // delay(1);
+  }
 
-//   gyrOffsetVal.x /= 50;
-//   gyrOffsetVal.y /= 50;
-//   gyrOffsetVal.z /= 50;
+  gyrOffsetVal.x /= 50;
+  gyrOffsetVal.y /= 50;
+  gyrOffsetVal.z /= 50;
 
-//   return hal::success();
-// }
+  return hal::success();
+}
 
-// hal::status icm20948::setAccOffsets(float xMin,
-//                              float xMax,
-//                              float yMin,
-//                              float yMax,
-//                              float zMin,
-//                              float zMax)
-// {
-//   accOffsetVal.x = (xMax + xMin) * 0.5;
-//   accOffsetVal.y = (yMax + yMin) * 0.5;
-//   accOffsetVal.z = (zMax + zMin) * 0.5;
-//   accCorrFactor.x = (xMax + abs(xMin)) / 32768.0;
-//   accCorrFactor.y = (yMax + abs(yMin)) / 32768.0;
-//   accCorrFactor.z = (zMax + abs(zMin)) / 32768.0;
+hal::status icm20948::setAccOffsets(float xMin,
+                             float xMax,
+                             float yMin,
+                             float yMax,
+                             float zMin,
+                             float zMax)
+{
+  accOffsetVal.x = (xMax + xMin) * 0.5;
+  accOffsetVal.y = (yMax + yMin) * 0.5;
+  accOffsetVal.z = (zMax + zMin) * 0.5;
+  accCorrFactor.x = (xMax + abs(xMin)) / 32768.0;
+  accCorrFactor.y = (yMax + abs(yMin)) / 32768.0;
+  accCorrFactor.z = (zMax + abs(zMin)) / 32768.0;
 
-//   return hal::success();
-// }
+  return hal::success();
+}
 
 hal::status icm20948::setGyrOffsets(float xOffset, float yOffset, float zOffset)
 {
@@ -276,43 +276,33 @@ hal::status icm20948::readSensor()
   return hal::success();
 }
 
-
-hal::result<icm20948::accel_data_t> icm20948::getAccRawValues()
+xyzFloat icm20948::getAccRawValues()
 {
-
-  auto accel_buffer = HAL_CHECK(hal::write_then_read<6>(*m_i2c,
-                                      m_address,
-                                      std::array<hal::byte, 1>{ ICM20948_ACCEL_OUT },
-                                      hal::never_timeout()));
-
-  accel_data_t accRawVal;
-  accRawVal.x = static_cast<uint32_t>(((accel_buffer[0]) << 8) | accel_buffer[1]) * 1.0;
-  accRawVal.y = static_cast<uint32_t>(((accel_buffer[2]) << 8) | accel_buffer[3]) * 1.0;
-  accRawVal.z = static_cast<uint32_t>(((accel_buffer[4]) << 8) | accel_buffer[5]) * 1.0;
-
-  
-  
+  xyzFloat accRawVal;
+  accRawVal.x = static_cast<int16_t>(((m_read_all_buffer[0]) << 8) | m_read_all_buffer[1]) * 1.0;
+  accRawVal.y = static_cast<int16_t>(((m_read_all_buffer[2]) << 8) | m_read_all_buffer[3]) * 1.0;
+  accRawVal.z = static_cast<int16_t>(((m_read_all_buffer[4]) << 8) | m_read_all_buffer[5]) * 1.0;
   return accRawVal;
 }
 
-// xyzFloat icm20948::getCorrectedAccRawValues()
-// {
-//   xyzFloat accRawVal = getAccRawValues();
-//   accRawVal = correctAccRawValues(accRawVal);
+xyzFloat icm20948::getCorrectedAccRawValues()
+{
+  xyzFloat accRawVal = getAccRawValues();
+  accRawVal = correctAccRawValues(accRawVal);
 
-//   return accRawVal;
-// }
+  return accRawVal;
+}
 
-// xyzFloat icm20948::getGValues()
-// {
-//   xyzFloat gVal, accRawVal;
-//   accRawVal = getCorrectedAccRawValues();
+xyzFloat icm20948::getGValues()
+{
+  xyzFloat gVal, accRawVal;
+  accRawVal = getCorrectedAccRawValues();
 
-//   gVal.x = accRawVal.x * accRangeFactor / 16384.0;
-//   gVal.y = accRawVal.y * accRangeFactor / 16384.0;
-//   gVal.z = accRawVal.z * accRangeFactor / 16384.0;
-//   return gVal;
-// }
+  gVal.x = accRawVal.x * accRangeFactor / 16384.0;
+  gVal.y = accRawVal.y * accRangeFactor / 16384.0;
+  gVal.z = accRawVal.z * accRangeFactor / 16384.0;
+  return gVal;
+}
 
 float icm20948::getTemperature()
 {
