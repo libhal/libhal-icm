@@ -28,55 +28,61 @@ hal::status application(hardware_map& p_map)
   auto& i2c = *p_map.i2c;
 
   hal::print(console, "icm Application Starting...\n\n");
-  auto icm_accel = HAL_CHECK(hal::icm::icm20948::create(i2c, 0x69));
+  auto icm_device = HAL_CHECK(hal::icm::icm20948::create(i2c, 0x69));
+
+  if (!icm_device.initMagnetometer()) {
+    hal::print(console, "Magnetometer does not respond");
+  }
+  else {
+    hal::print(console, "Magnetometer is connected");
+  }
+
+  icm_device.autoOffsets();
 
   while (true) {
 
     (void)hal::delay(clock, 500ms);
     hal::print(console, "\n\n================Reading IMU================\n\n");
-    auto WAI = HAL_CHECK(icm_accel.whoAmI());
-
-    if (WAI != 0xEA) {
-      hal::print(console, "\n\ndata wrong\n");
-      hal::print<32>(console, "Data: 0x%x\n", WAI);
-    } else {
-      hal::print(console, "data right\n");
-      hal::print<32>(console, "Data: 0x%x\n", WAI);
-    }
-
-    auto sleep = HAL_CHECK(icm_accel.sleep_check());
-
-    if (sleep != 0x01) {
-      hal::print(console, "\n\nsleep data wrong\n");
-      hal::print<32>(console, "Data: 0x%x\n", sleep);
-    } else {
-      hal::print(console, "sleep data right\n");
-      hal::print<32>(console, "Data: 0x%x\n", sleep);
-    }
-
-
-    auto accel = HAL_CHECK(icm_accel.accel_check());
-
-    if (accel != 0x07) {
-      hal::print(console, "\n\naccel data wrong\n");
-      hal::print<32>(console, "Data: 0x%x\n", accel);
-    } else {
-      hal::print(console, "accel data right\n");
-      hal::print<32>(console, "Data: 0x%x\n", accel);
-    }
-
-    
 
     (void)hal::delay(clock, 500ms);
-    HAL_CHECK(icm_accel.readSensor());
-    auto acceleration = icm_accel.getAccRawValues();
-    hal::print<128>(console,
-                    "Accelerometer: x = %fg, y = %fg, z = %fg",
-                    acceleration.x,
-                    acceleration.y,
-                    acceleration.z);
+    HAL_CHECK(icm_device.readSensor());
+    auto gVal = icm_device.getGValues();
 
-    hal::print(console,"\n");
+    auto gyro_raw = icm_device.getGyrRawValues();
+    auto gyr = icm_device.getGyrValues();
+    auto temp = icm_device.getTemperature();
+    auto mag = icm_device.getMagValues();
+
+
+    hal::print<128>(console,
+                "\n\nG-Accel Values: x = %fg, y = %fg, z = %fg",
+                gVal.x,
+                gVal.y,
+                gVal.z);
+
+
+    hal::print<128>(console,
+            "\n\nRaw Gyro Values: x = %f, y = %f, z = %f",
+            gyro_raw.x,
+            gyro_raw.y,
+            gyro_raw.z);
+
+    hal::print<128>(console,
+            "\n\nGyro Values: x = %f, y = %f, z = %f",
+            gyr.x,
+            gyr.y,
+            gyr.z);
+
+    hal::print<128>(console,
+        "\n\nCurrent Temperature: %f°C",
+        temp);
+
+    hal::print<128>(console,
+            "\n\nMag Values: x = %f, y = %f, z = %f",
+            mag.x,
+            mag.y,
+            mag.z);
+
   }
   return hal::success();
 }

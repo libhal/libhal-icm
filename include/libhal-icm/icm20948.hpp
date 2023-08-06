@@ -145,6 +145,7 @@ public:
   /* Basic settings */
 
   hal::status init();
+  hal::status defaultSetup();
   hal::status autoOffsets();
   hal::status setAccOffsets(float xMin,
                      float xMax,
