@@ -118,7 +118,9 @@ static constexpr hal::byte AK09916_CNTL_2 = 0x31;
 static constexpr hal::byte AK09916_CNTL_3 = 0x32;
 
 /* Register Bits */
-static constexpr hal::byte ICM20948_RESET = 0x80;
+// static constexpr hal::byte ICM20948_RESET = 0x80;
+static constexpr hal::byte ICM20948_RESET = 0x41;
+
 static constexpr hal::byte ICM20948_I2C_MST_EN = 0x20;
 static constexpr hal::byte ICM20948_SLEEP = 0x40;
 static constexpr hal::byte ICM20948_LP_EN = 0x20;

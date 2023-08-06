@@ -22,6 +22,8 @@
 
 #include "icm20948_reg.hpp"
 #include <libhal-icm/icm20948.hpp>
+#include <libhal-util/i2c.hpp>
+#include <array>
 
 namespace hal::icm {
 using namespace std::literals;
@@ -41,7 +43,7 @@ result<icm20948> icm20948::create(hal::i2c& p_i2c,
 hal::status icm20948::init()
 {
   currentBank = 0;
-  reset_ICM20948();
+  // reset_ICM20948();
   if (HAL_CHECK(whoAmI()) != ICM20948_WHO_AM_I_CONTENT) {
     return hal::new_error();
   }
@@ -59,69 +61,71 @@ hal::status icm20948::init()
   gyrRangeFactor = 1.0;
 
   sleep(false);
-  writeRegister8(2, ICM20948_ODR_ALIGN_EN, 1);  // aligns ODR
+  enableAcc(true);
+
+  // writeRegister8(2, ICM20948_ODR_ALIGN_EN, 1);  // aligns ODR
   return hal::success();
 }
 
-hal::status icm20948::autoOffsets()
-{
-  xyzFloat accRawVal, gyrRawVal;
-  accOffsetVal.x = 0.0;
-  accOffsetVal.y = 0.0;
-  accOffsetVal.z = 0.0;
+// hal::status icm20948::autoOffsets()
+// {
+//   xyzFloat accRawVal, gyrRawVal;
+//   accOffsetVal.x = 0.0;
+//   accOffsetVal.y = 0.0;
+//   accOffsetVal.z = 0.0;
 
-  setGyrDLPF(ICM20948_DLPF_6);           // lowest noise
-  setGyrRange(ICM20948_GYRO_RANGE_250);  // highest resolution
-  setAccRange(ICM20948_ACC_RANGE_2G);
-  setAccDLPF(ICM20948_DLPF_6);
-  // delay(100);
+//   setGyrDLPF(ICM20948_DLPF_6);           // lowest noise
+//   setGyrRange(ICM20948_GYRO_RANGE_250);  // highest resolution
+//   setAccRange(ICM20948_ACC_RANGE_2G);
+//   setAccDLPF(ICM20948_DLPF_6);
+//   // delay(100);
 
-  for (int i = 0; i < 50; i++) {
-    readSensor();
-    accRawVal = getAccRawValues();
-    accOffsetVal.x += accRawVal.x;
-    accOffsetVal.y += accRawVal.y;
-    accOffsetVal.z += accRawVal.z;
-    // delay(10);
-  }
+//   for (int i = 0; i < 50; i++) {
+//     readSensor();
+//     accRawVal = getAccRawValues();
+//     accOffsetVal.x += accRawVal.x;
+//     accOffsetVal.y += accRawVal.y;
+//     accOffsetVal.z += accRawVal.z;
+//     // delay(10);
+//   }
 
-  accOffsetVal.x /= 50;
-  accOffsetVal.y /= 50;
-  accOffsetVal.z /= 50;
-  accOffsetVal.z -= 16384.0;
+//   accOffsetVal.x /= 50;
+//   accOffsetVal.y /= 50;
+//   accOffsetVal.z /= 50;
+//   accOffsetVal.z -= 16384.0;
 
-  for (int i = 0; i < 50; i++) {
-    readSensor();
-    gyrRawVal = getGyrRawValues();
-    gyrOffsetVal.x += gyrRawVal.x;
-    gyrOffsetVal.y += gyrRawVal.y;
-    gyrOffsetVal.z += gyrRawVal.z;
-    // delay(1);
-  }
+//   for (int i = 0; i < 50; i++) {
+//     readSensor();
+//     gyrRawVal = getGyrRawValues();
+//     gyrOffsetVal.x += gyrRawVal.x;
+//     gyrOffsetVal.y += gyrRawVal.y;
+//     gyrOffsetVal.z += gyrRawVal.z;
+//     // delay(1);
+//   }
 
-  gyrOffsetVal.x /= 50;
-  gyrOffsetVal.y /= 50;
-  gyrOffsetVal.z /= 50;
+//   gyrOffsetVal.x /= 50;
+//   gyrOffsetVal.y /= 50;
+//   gyrOffsetVal.z /= 50;
 
-  return hal::success();
-}
+//   return hal::success();
+// }
 
-hal::status icm20948::setAccOffsets(float xMin,
-                             float xMax,
-                             float yMin,
-                             float yMax,
-                             float zMin,
-                             float zMax)
-{
-  accOffsetVal.x = (xMax + xMin) * 0.5;
-  accOffsetVal.y = (yMax + yMin) * 0.5;
-  accOffsetVal.z = (zMax + zMin) * 0.5;
-  accCorrFactor.x = (xMax + abs(xMin)) / 32768.0;
-  accCorrFactor.y = (yMax + abs(yMin)) / 32768.0;
-  accCorrFactor.z = (zMax + abs(zMin)) / 32768.0;
+// hal::status icm20948::setAccOffsets(float xMin,
+//                              float xMax,
+//                              float yMin,
+//                              float yMax,
+//                              float zMin,
+//                              float zMax)
+// {
+//   accOffsetVal.x = (xMax + xMin) * 0.5;
+//   accOffsetVal.y = (yMax + yMin) * 0.5;
+//   accOffsetVal.z = (zMax + zMin) * 0.5;
+//   accCorrFactor.x = (xMax + abs(xMin)) / 32768.0;
+//   accCorrFactor.y = (yMax + abs(yMin)) / 32768.0;
+//   accCorrFactor.z = (zMax + abs(zMin)) / 32768.0;
 
-  return hal::success();
-}
+//   return hal::success();
+// }
 
 hal::status icm20948::setGyrOffsets(float xOffset, float yOffset, float zOffset)
 {
@@ -137,16 +141,33 @@ hal::result<hal::byte> icm20948::whoAmI()
   return HAL_CHECK(readRegister8(0, ICM20948_WHO_AM_I));
 }
 
+hal::result<hal::byte> icm20948::sleep_check()
+{
+  return HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_1));
+}
+
+hal::result<hal::byte> icm20948::accel_check()
+{
+  return HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_2));
+}
+
+
+
 hal::status icm20948::enableAcc(bool enAcc)
 {
-  regVal = HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_2));
+  // regVal = HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_2));
 
-  if (enAcc) {
-    regVal &= ~ICM20948_ACC_EN;
-  } else {
-    regVal |= ICM20948_ACC_EN;
-  }
-  HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_2, regVal));
+  // if (enAcc) {
+  //   regVal &= ~ICM20948_ACC_EN;
+  // } else {
+  //   regVal |= ICM20948_ACC_EN;
+  // }
+
+    HAL_CHECK(hal::write(*m_i2c,
+                      m_address,
+                      std::array<hal::byte, 2>{ 0x07, 0x07 },
+                      hal::never_timeout()));
+  // HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_2, 0x03));
 
   return hal::success();
 }
@@ -255,33 +276,43 @@ hal::status icm20948::readSensor()
   return hal::success();
 }
 
-xyzFloat icm20948::getAccRawValues()
+
+hal::result<icm20948::accel_data_t> icm20948::getAccRawValues()
 {
-  xyzFloat accRawVal;
-  accRawVal.x = static_cast<int16_t>(((m_read_all_buffer[0]) << 8) | m_read_all_buffer[1]) * 1.0;
-  accRawVal.y = static_cast<int16_t>(((m_read_all_buffer[2]) << 8) | m_read_all_buffer[3]) * 1.0;
-  accRawVal.z = static_cast<int16_t>(((m_read_all_buffer[4]) << 8) | m_read_all_buffer[5]) * 1.0;
+
+  auto accel_buffer = HAL_CHECK(hal::write_then_read<6>(*m_i2c,
+                                      m_address,
+                                      std::array<hal::byte, 1>{ ICM20948_ACCEL_OUT },
+                                      hal::never_timeout()));
+
+  accel_data_t accRawVal;
+  accRawVal.x = static_cast<uint32_t>(((accel_buffer[0]) << 8) | accel_buffer[1]) * 1.0;
+  accRawVal.y = static_cast<uint32_t>(((accel_buffer[2]) << 8) | accel_buffer[3]) * 1.0;
+  accRawVal.z = static_cast<uint32_t>(((accel_buffer[4]) << 8) | accel_buffer[5]) * 1.0;
+
+  
+  
   return accRawVal;
 }
 
-xyzFloat icm20948::getCorrectedAccRawValues()
-{
-  xyzFloat accRawVal = getAccRawValues();
-  accRawVal = correctAccRawValues(accRawVal);
+// xyzFloat icm20948::getCorrectedAccRawValues()
+// {
+//   xyzFloat accRawVal = getAccRawValues();
+//   accRawVal = correctAccRawValues(accRawVal);
 
-  return accRawVal;
-}
+//   return accRawVal;
+// }
 
-xyzFloat icm20948::getGValues()
-{
-  xyzFloat gVal, accRawVal;
-  accRawVal = getCorrectedAccRawValues();
+// xyzFloat icm20948::getGValues()
+// {
+//   xyzFloat gVal, accRawVal;
+//   accRawVal = getCorrectedAccRawValues();
 
-  gVal.x = accRawVal.x * accRangeFactor / 16384.0;
-  gVal.y = accRawVal.y * accRangeFactor / 16384.0;
-  gVal.z = accRawVal.z * accRangeFactor / 16384.0;
-  return gVal;
-}
+//   gVal.x = accRawVal.x * accRangeFactor / 16384.0;
+//   gVal.y = accRawVal.y * accRangeFactor / 16384.0;
+//   gVal.z = accRawVal.z * accRangeFactor / 16384.0;
+//   return gVal;
+// }
 
 float icm20948::getTemperature()
 {
@@ -374,14 +405,30 @@ hal::status icm20948::setAccAverageInCycleMode(ICM20948_accAvgLowPower avg)
 
 hal::status icm20948::sleep(bool sleep)
 {
-  regVal = HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_1));
+  // HAL_CHECK(readRegister8(0, ICM20948_PWR_MGMT_1));
 
-  if (sleep) {
-    regVal |= ICM20948_SLEEP;
-  } else {
-    regVal &= ~ICM20948_SLEEP;
-  }
-  HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_1, regVal));
+  // if (sleep) {
+  //   regVal |= ICM20948_SLEEP;
+  // } else {
+  //   regVal &= ~ICM20948_SLEEP;
+  // }
+  // HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_1, 0x01));
+
+  auto reg_buffer = HAL_CHECK(hal::write_then_read<1>(*m_i2c,
+                                  m_address,
+                                  std::array<hal::byte, 1>{ 0x07 },
+                                  hal::never_timeout()));
+
+  // HAL_CHECK(hal::write(*m_i2c, m_address, write_reg, hal::never_timeout()));
+  // HAL_CHECK(hal::write(*m_i2c, m_address, val_reg, hal::never_timeout()));
+
+  HAL_CHECK(hal::write(*m_i2c,
+                      m_address,
+                      std::array<hal::byte, 2>{ 0x06, 0x01 },
+                      hal::never_timeout()));
+
+
+
 
   return hal::success();
 }
@@ -573,31 +620,53 @@ hal::status icm20948::switchBank(hal::byte newBank)
   if (newBank != currentBank) {
     currentBank = newBank;
     currentBank = currentBank << 4;
+  }
     
-    std::array<hal::byte, 1> reg_bank_sel = {ICM20948_REG_BANK_SEL};
-    std::array<hal::byte, 1> currentBank_reg = {currentBank};
+    // std::array<hal::byte, 1> reg_bank_sel = {ICM20948_REG_BANK_SEL};
+    // std::array<hal::byte, 1> currentBank_reg = {currentBank};
 
-    HAL_CHECK(hal::write(*m_i2c, m_address, reg_bank_sel, hal::never_timeout()));
-    HAL_CHECK(hal::write(*m_i2c, m_address, currentBank_reg, hal::never_timeout()));
+
+    auto reg_buffer = HAL_CHECK(hal::write_then_read<1>(*m_i2c,
+                                  m_address,
+                                  std::array<hal::byte, 1>{ ICM20948_REG_BANK_SEL },
+                                  hal::never_timeout()));
+
+    hal::byte reg_val = reg_buffer[0];
+    HAL_CHECK(hal::write(*m_i2c,
+                              m_address,
+                              std::array<hal::byte, 2>{ reg_val, currentBank },
+                              hal::never_timeout()));
+
+    // HAL_CHECK(hal::write(*m_i2c, m_address, reg_bank_sel, hal::never_timeout()));
+    // HAL_CHECK(hal::write(*m_i2c, m_address, currentBank_reg, hal::never_timeout()));
 
     // _wire->beginTransmission(m_address);
     // _wire->write(ICM20948_REG_BANK_SEL);
     // _wire->write(currentBank << 4);
     // _wire->endTransmission();
-  }
 
   return hal::success();
 }
 
-hal::status icm20948::writeRegister8(hal::byte bank, hal::byte reg, hal::byte val)
+hal::status icm20948::writeRegister8(hal::byte bank, hal::byte p_reg_addr, hal::byte p_val)
 {
   switchBank(bank);
 
-  std::array<hal::byte, 1> write_reg = {reg};
-  std::array<hal::byte, 1> val_reg = {val};
+  // std::array<hal::byte, 1> write_reg = {reg};
+  // std::array<hal::byte, 1> val_reg = {val};
 
-  HAL_CHECK(hal::write(*m_i2c, m_address, write_reg, hal::never_timeout()));
-  HAL_CHECK(hal::write(*m_i2c, m_address, val_reg, hal::never_timeout()));
+    auto reg_buffer = HAL_CHECK(hal::write_then_read<1>(*m_i2c,
+                                      m_address,
+                                      std::array<hal::byte, 1>{ p_reg_addr },
+                                      hal::never_timeout()));
+
+  // HAL_CHECK(hal::write(*m_i2c, m_address, write_reg, hal::never_timeout()));
+  // HAL_CHECK(hal::write(*m_i2c, m_address, val_reg, hal::never_timeout()));
+
+  HAL_CHECK(hal::write(*m_i2c,
+                      m_address,
+                      std::array<hal::byte, 2>{ reg_buffer[0], p_val },
+                      hal::never_timeout()));
 
   // _wire->beginTransmission(m_address);
   // _wire->write(reg);
@@ -630,14 +699,12 @@ hal::status icm20948::writeRegister16(hal::byte bank, hal::byte reg, int16_t val
   return hal::success();
 }
 
-hal::result<hal::byte> icm20948::readRegister8(hal::byte bank, hal::byte reg)
+hal::result<hal::byte> icm20948::readRegister8(hal::byte bank, hal::byte read_reg)
 {
   switchBank(bank);
-  // hal::byte regValue = 0;
 
-  std::array<hal::byte, 1> ctrl_buffer {};
-  std::array<hal::byte, 1> read_reg = {reg};
-  HAL_CHECK(hal::write_then_read(*m_i2c, m_address, read_reg, ctrl_buffer, hal::never_timeout()));
+  auto ctrl_buffer = HAL_CHECK(hal::write_then_read<1>(*m_i2c, m_address, std::array<hal::byte, 1>{ read_reg }, hal::never_timeout()));
+
 
   // _wire->beginTransmission(m_address);
   // _wire->write(reg);
@@ -671,12 +738,16 @@ hal::result<int16_t> icm20948::readRegister16(hal::byte bank, hal::byte reg)
   return reg16Val;
 }
 
-hal::status icm20948::readAllData(std::array<hal::byte, 20> data)
+hal::status icm20948::readAllData(std::array<hal::byte, 20>& data)
 {
   switchBank(0);
   // std::array<hal::byte, 20> read_buffer;
-  std::array<hal::byte, 1> reg = {ICM20948_ACCEL_OUT};
-  HAL_CHECK(hal::write_then_read(*m_i2c, m_address, reg, data, hal::never_timeout()));
+  // std::array<hal::byte, 1> reg = {ICM20948_ACCEL_OUT};
+
+
+  data = HAL_CHECK(hal::write_then_read<20>(*m_i2c, m_address, std::array<hal::byte, 1>{ ICM20948_ACCEL_OUT }, hal::never_timeout()));
+
+  // HAL_CHECK(hal::write_then_read(*m_i2c, m_address, reg, data, hal::never_timeout()));
 
   // _wire->beginTransmission(m_address);
   // _wire->write(ICM20948_ACCEL_OUT);

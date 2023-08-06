@@ -15,10 +15,9 @@
 #pragma once
 
 #include <libhal-icm/xyzFloat.hpp>
-#include <libhal-util/bit.hpp>
 #include <libhal/i2c.hpp>
-#include <libhal-util/i2c.hpp>
-#include <libhal-util/map.hpp>
+#include <libhal/timeout.hpp>
+#include <libhal/units.hpp>
 
 namespace hal::icm {
 
@@ -27,8 +26,18 @@ class icm20948
 
 public:
 
+
+
+
   static result<icm20948> create(hal::i2c& p_i2c,
                                   hal::byte p_device_address);
+
+  struct accel_data_t{
+    float x = 0.0;
+    float y = 0.0;
+    float z = 0.0;
+  };
+
 
   typedef enum ICM20948_CYCLE
   {
@@ -155,6 +164,13 @@ public:
                      float zMax);
   hal::status setGyrOffsets(float xOffset, float yOffset, float zOffset);
   hal::result<hal::byte> whoAmI();
+
+//Delete Later
+  hal::result<hal::byte> sleep_check();
+  hal::result<hal::byte> accel_check();
+
+
+
   hal::status enableAcc(bool enAcc);
   hal::status setAccRange(ICM20948_accRange accRange);
   hal::status setAccDLPF(ICM20948_dlpf dlpf);
@@ -168,7 +184,7 @@ public:
   /* x,y,z results */
 
   hal::status readSensor();
-  xyzFloat getAccRawValues();
+  hal::result<accel_data_t> getAccRawValues();
   xyzFloat getCorrectedAccRawValues();
   xyzFloat getGValues();
   xyzFloat getAccRawValuesFromFifo();
@@ -235,7 +251,7 @@ private:
   hal::result<hal::byte> readRegister8(hal::byte bank, hal::byte reg);
   hal::result<int16_t> readRegister16(hal::byte bank, hal::byte reg);
 
-  hal::status readAllData(std::array<hal::byte, 20> data);
+  hal::status readAllData(std::array<hal::byte, 20>& data);
   hal::status writeAK09916Register8(hal::byte reg, hal::byte val);
   hal::result<hal::byte> readAK09916Register8(hal::byte reg);
   hal::result<int16_t> readAK09916Register16(hal::byte reg);
