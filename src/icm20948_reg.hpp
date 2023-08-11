@@ -138,11 +138,15 @@ static constexpr hal::byte AK09916_OVF = 0x08;
 static constexpr hal::byte AK09916_READ = 0x80;
 
 /* Others */
-static constexpr hal::byte AK09916_WHO_AM_I_1 = 0x4809;
-static constexpr hal::byte AK09916_WHO_AM_I_2 = 0x0948;
+// static constexpr hal::byte AK09916_WHO_AM_I_1 = 0x48;
+// static constexpr hal::byte AK09916_WHO_AM_I_2 = 0x09;
+static constexpr uint16_t AK09916_WHO_AM_I_1 = 0x4809;
+static constexpr uint16_t AK09916_WHO_AM_I_2 = 0x0948;
+
+
 static constexpr hal::byte ICM20948_WHO_AM_I_CONTENT = 0xEA;
-static constexpr float ICM20948_ROOM_TEMP_OFFSET = { 0.0 };
-static constexpr float ICM20948_T_SENSITIVITY = { 333.87 };
-static constexpr float AK09916_MAG_LSB = { 0.1495 };
+static constexpr float ICM20948_ROOM_TEMP_OFFSET = 0.0;
+static constexpr float ICM20948_T_SENSITIVITY = 333.87;
+static constexpr float AK09916_MAG_LSB = 0.1495;
 
 }  // namespace hal::icm

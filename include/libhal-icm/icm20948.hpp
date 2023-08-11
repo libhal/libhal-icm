@@ -208,7 +208,7 @@ public:
   /* Magnetometer */
 
   hal::status initMagnetometer();
-  hal::result<uint16_t> whoAmIMag();
+  hal::result<hal::byte> whoAmIMag();
   void setMagOpMode(AK09916_opMode opMode);
   void resetMag();
 
@@ -240,12 +240,12 @@ private:
   hal::status writeRegister16(hal::byte bank, hal::byte reg, int16_t val);
 
   hal::result<hal::byte> readRegister8(hal::byte bank, hal::byte reg);
-  hal::result<int16_t> readRegister16(hal::byte bank, hal::byte reg);
+  hal::result<hal::byte> readRegister16(hal::byte bank, hal::byte reg);
 
   hal::status readAllData(std::array<hal::byte, 20>& data);
   hal::status writeAK09916Register8(hal::byte reg, hal::byte val);
   hal::result<hal::byte> readAK09916Register8(hal::byte reg);
-  hal::result<int16_t> readAK09916Register16(hal::byte reg);
+  hal::result<hal::byte> readAK09916Register16(hal::byte reg);
 
   hal::status reset_ICM20948();
   hal::status enableI2CMaster();
