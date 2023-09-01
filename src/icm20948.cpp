@@ -61,8 +61,8 @@ hal::status icm20948::init()
   gyrRangeFactor = 1.0;
 
   sleep(false);
-  enableAcc(true);
-  enableGyr(true);
+  // enableAcc(true);
+  // enableGyr(true);
 
   writeRegister8(2, ICM20948_ODR_ALIGN_EN, 1);  // aligns ODR
   return hal::success();
@@ -418,7 +418,6 @@ hal::status icm20948::initMagnetometer()
   // if (!((whoAmI == AK09916_WHO_AM_I_1) || (whoAmI == AK09916_WHO_AM_I_2))) {
   //   return hal::new_error();
   // }
-  setMagOpMode(AK09916_CONT_MODE_100HZ);
 
   return hal::success();
 }
@@ -526,6 +525,7 @@ hal::result<hal::byte> icm20948::readRegister8(hal::byte bank, hal::byte read_re
   auto ctrl_buffer = HAL_CHECK(hal::write_then_read<1>(*m_i2c, m_address, std::array<hal::byte, 1>{ read_reg }, hal::never_timeout()));
   return ctrl_buffer[0];
 }
+
 
 hal::result<hal::byte> icm20948::readRegister16(hal::byte bank, hal::byte reg)
 {

@@ -30,6 +30,9 @@ hal::status application(hardware_map& p_map)
   hal::print(console, "icm Application Starting...\n\n");
   auto icm_device = HAL_CHECK(hal::icm::icm20948::create(i2c, 0x69));
   (void)hal::delay(clock, 100ms);
+  icm_device.autoOffsets();
+  (void)hal::delay(clock, 100ms);
+
 
   HAL_CHECK(icm_device.initMagnetometer());
   auto mag_check = HAL_CHECK(icm_device.whoAmIMag());
@@ -42,30 +45,28 @@ hal::status application(hardware_map& p_map)
     hal::print<32>(console, "\nwho am I: %x", mag_check);
   }
 
-  icm_device.autoOffsets();
-  (void)hal::delay(clock, 100ms);
 
   while (true) {
     hal::print(console, "\n\n================Reading IMU================\n");
 
     (void)hal::delay(clock, 500ms);
     HAL_CHECK(icm_device.readSensor());
-    auto gVal = icm_device.getGValues();
-    auto gyr = icm_device.getGyrValues();
+    // auto gVal = icm_device.getGValues();
+    // auto gyr = icm_device.getGyrValues();
     auto mag = icm_device.getMagValues();
-    auto temp = icm_device.getTemperature();
+    // auto temp = icm_device.getTemperature();
 
-    hal::print<128>(console,
-                    "\n\nG-Accel Values:    x = %fg, y = %fg, z = %fg",
-                    gVal.x,
-                    gVal.y,
-                    gVal.z);
+    // hal::print<128>(console,
+    //                 "\n\nG-Accel Values:    x = %fg, y = %fg, z = %fg",
+    //                 gVal.x,
+    //                 gVal.y,
+    //                 gVal.z);
 
-    hal::print<128>(console,
-                    "\n\nGyro Values:       x = %f,  y = %f,  z = %f",
-                    gyr.x,
-                    gyr.y,
-                    gyr.z);
+    // hal::print<128>(console,
+    //                 "\n\nGyro Values:       x = %f,  y = %f,  z = %f",
+    //                 gyr.x,
+    //                 gyr.y,
+    //                 gyr.z);
 
     hal::print<128>(console,
                     "\n\nMag Values:        x = %f,  y = %f,  z = %f",
@@ -73,7 +74,7 @@ hal::status application(hardware_map& p_map)
                     mag.y,
                     mag.z);
 
-    hal::print<128>(console, "\n\nCurrent Temperature: %f°C", temp);
+    // hal::print<128>(console, "\n\nCurrent Temperature: %f°C", temp);
 
     hal::print(console, "\n\n===========================================\n");
   }
