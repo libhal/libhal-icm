@@ -25,9 +25,64 @@ class icm20948
 {
 
 public:
+  struct accel_read_t
+  {
+    float x;
+    float y;
+    float z;
+  };
 
-  static result<icm20948> create(hal::i2c& p_i2c,
-                                  hal::byte p_device_address);
+  struct gyro_read_t
+  {
+    float x;
+    float y;
+    float z;
+  };
+
+  struct mag_read_t
+  {
+    float x;
+    float y;
+    float z;
+  };
+
+  struct temp_read_t
+  {
+    float temp;
+  };
+
+
+  /**
+   * @brief Read acceleration data from out_x_msb_r, out_x_lsb_r,
+   *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
+   *        and perform acceleration conversion to g.
+   */
+  [[nodiscard]] hal::result<accel_read_t> read_acceleration();
+
+  /**
+   * @brief Read gyroscope data from out_x_msb_r, out_x_lsb_r,
+   *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
+   *        and perform gyroscope conversion to rad/s.
+   */
+  [[nodiscard]] hal::result<gyro_read_t> read_gyroscope();
+
+  /**
+   * @brief Read magnetometer data from out_x_msb_r, out_x_lsb_r,
+   *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
+   *        and perform magnetometer conversion to uT.
+   */
+  [[nodiscard]] hal::result<mag_read_t> read_magnetometer();
+
+
+  /**
+   * @brief Read pressure data from out_t_msb_r and out_t_lsb_r
+   *        and perform temperature conversion to celsius.
+   */
+  [[nodiscard]] hal::result<temp_read_t> read_temperature();
+
+
+
+  static result<icm20948> create(hal::i2c& p_i2c, hal::byte p_device_address);
 
   typedef enum ICM20948_CYCLE
   {
@@ -148,19 +203,17 @@ public:
   hal::status defaultSetup();
   hal::status autoOffsets();
   hal::status setAccOffsets(float xMin,
-                     float xMax,
-                     float yMin,
-                     float yMax,
-                     float zMin,
-                     float zMax);
+                            float xMax,
+                            float yMin,
+                            float yMax,
+                            float zMin,
+                            float zMax);
   hal::status setGyrOffsets(float xOffset, float yOffset, float zOffset);
   hal::result<hal::byte> whoAmI();
 
-//Delete Later
+  // Delete Later
   hal::result<hal::byte> sleep_check();
   hal::result<hal::byte> accel_check();
-
-
 
   hal::status enableAcc(bool enAcc);
   hal::status setAccRange(ICM20948_accRange accRange);
@@ -218,7 +271,8 @@ private:
   hal::byte m_gscale = 0x00;
 
   hal::byte currentBank;
-  std::array<hal::byte, 20> m_read_all_buffer {};
+  std::array<hal::byte, 20> m_read_all_buffer{};
+  std::array<hal::byte, 6> data{};
   xyzFloat accOffsetVal;
   xyzFloat accCorrFactor;
   xyzFloat gyrOffsetVal;
@@ -231,7 +285,7 @@ private:
     , m_address(p_device_address)
   {
   }
-  
+
   hal::status setClockToAutoSelect();
   xyzFloat correctAccRawValues(xyzFloat accRawVal);
   xyzFloat correctGyrRawValues(xyzFloat gyrRawVal);
