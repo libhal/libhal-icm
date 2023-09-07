@@ -12,13 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// TODO: We should create the read and write functions in this code to
-// encapsulate the read and write functions from libhal to make it easier to
-// read and write since we do it very often in this code.
-// https://github.com/wollewald/ICM20948_WE/tree/main
-// Also need to understand the banks better.  I think we can just use bank 0 for
-// everything.
-
 #include "icm20948_reg.hpp"
 #include <cmath>
 #include <array>
@@ -64,7 +57,7 @@ hal::status icm20948::init()
   enableAcc(true);
   enableGyr(true);
 
-  // writeRegister8(2, ICM20948_ODR_ALIGN_EN, 1);  // aligns ODR
+  writeRegister8(2, ICM20948_ODR_ALIGN_EN, 1);  // aligns ODR
   return hal::success();
 }
 
@@ -241,25 +234,6 @@ hal::status icm20948::setTempDLPF(ICM20948_dlpf dlpf)
   return hal::success();
 }
 
-xyzFloat icm20948::getMagValues()
-{
-  int16_t x, y, z;
-  xyzFloat mag;
-
-  mag.x =
-    static_cast<int16_t>((m_read_all_buffer[15]) << 8) | m_read_all_buffer[14];
-  mag.y =
-    static_cast<int16_t>((m_read_all_buffer[17]) << 8) | m_read_all_buffer[16];
-  mag.z =
-    static_cast<int16_t>((m_read_all_buffer[19]) << 8) | m_read_all_buffer[18];
-
-  // mag.x = x * AK09916_MAG_LSB;
-  // mag.y = y * AK09916_MAG_LSB;
-  // mag.z = z * AK09916_MAG_LSB;
-
-  return mag;
-}
-
 /********* Power, Sleep, Standby *********/
 
 hal::status icm20948::enableCycle(ICM20948_cycle cycle)
@@ -316,7 +290,7 @@ hal::status icm20948::initMagnetometer()
   resetMag();
   // reset_ICM20948();
   // sleep(false);
-  writeRegister8(2, ICM20948_ODR_ALIGN_EN, 1);  // aligns ODR
+  // writeRegister8(2, ICM20948_ODR_ALIGN_EN, 1);  // aligns ODR
   enableI2CMaster();
 
   // auto whoAmI = HAL_CHECK(whoAmIMag());
@@ -356,27 +330,6 @@ hal::status icm20948::setClockToAutoSelect()
   regVal |= 0x01;
   HAL_CHECK(writeRegister8(0, ICM20948_PWR_MGMT_1, regVal));
   return hal::success();
-}
-
-xyzFloat icm20948::correctAccRawValues(xyzFloat accRawVal)
-{
-  accRawVal.x =
-    (accRawVal.x - (accOffsetVal.x / accRangeFactor)) / accCorrFactor.x;
-  accRawVal.y =
-    (accRawVal.y - (accOffsetVal.y / accRangeFactor)) / accCorrFactor.y;
-  accRawVal.z =
-    (accRawVal.z - (accOffsetVal.z / accRangeFactor)) / accCorrFactor.z;
-
-  return accRawVal;
-}
-
-xyzFloat icm20948::correctGyrRawValues(xyzFloat gyrRawVal)
-{
-  gyrRawVal.x -= (gyrOffsetVal.x / gyrRangeFactor);
-  gyrRawVal.y -= (gyrOffsetVal.y / gyrRangeFactor);
-  gyrRawVal.z -= (gyrOffsetVal.z / gyrRangeFactor);
-
-  return gyrRawVal;
 }
 
 hal::status icm20948::switchBank(hal::byte newBank)
@@ -491,12 +444,12 @@ hal::result<hal::byte> icm20948::readAK09916Register8(hal::byte reg)
   return regVal;
 }
 
-hal::result<hal::byte> icm20948::readAK09916Register16(hal::byte reg)
+hal::result<int16_t> icm20948::readAK09916Register16(hal::byte reg)
 {
-  hal::byte regValue = 0;
+  int16_t regValue = 0;
   enableMagDataRead(reg, 0x02);
   regValue = HAL_CHECK(readRegister16(0, ICM20948_EXT_SLV_SENS_DATA_00));
-  // enableMagDataRead(AK09916_HXL, 0x08);
+  enableMagDataRead(AK09916_HXL, 0x08);
   return regValue;
 }
 
@@ -598,6 +551,33 @@ hal::result<icm20948::gyro_read_t> icm20948::read_gyroscope()
   gyro_read.z = gyro_read_raw.z * gyrRangeFactor * 250.0 / 32768.0;
 
   return gyro_read;
+}
+
+
+
+hal::result<icm20948::mag_read_t> icm20948::read_magnetometer()
+{
+  // readAK09916Register16(ICM20948_EXT_SLV_SENS_DATA_00);
+  std::array<hal::byte, 6> data{};
+  int16_t x,y,z;
+  mag_read_t mag_read;
+
+  switchBank(0);
+  data = HAL_CHECK(
+    hal::write_then_read<6>(*m_i2c,
+                            m_address,
+                            std::array<hal::byte, 1>{ ICM20948_EXT_SLV_SENS_DATA_00 },
+                            hal::never_timeout()));
+
+  x = static_cast<int16_t>((data[0]) << 8) | data[1];
+  y = static_cast<int16_t>((data[2]) << 8) | data[3];
+  z = static_cast<int16_t>((data[4]) << 8) | data[5];
+
+  mag_read.x = x * AK09916_MAG_LSB;
+  mag_read.y = y * AK09916_MAG_LSB;
+  mag_read.z = z * AK09916_MAG_LSB;
+
+  return mag_read;
 }
 
 

@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include <libhal-icm/xyzFloat.hpp>
 #include <libhal/i2c.hpp>
 #include <libhal/timeout.hpp>
 #include <libhal/units.hpp>
@@ -225,25 +224,9 @@ public:
   hal::status setGyrSampleRateDivider(hal::byte gyrSplRateDiv);
   hal::status setTempDLPF(ICM20948_dlpf dlpf);
 
-  /* x,y,z results */
-
   hal::status readSensor();
-  xyzFloat getAccRawValues();
-  xyzFloat getCorrectedAccRawValues();
-  xyzFloat getGValues();
-  xyzFloat getAccRawValuesFromFifo();
-  xyzFloat getCorrectedAccRawValuesFromFifo();
-  xyzFloat getGValuesFromFifo();
-  float getResultantG(xyzFloat gVal);
-  float getTemperature();
-  xyzFloat getGyrRawValues();
-  xyzFloat getCorrectedGyrRawValues();
-  xyzFloat getGyrValues();
-  xyzFloat getGyrValuesFromFifo();
-  xyzFloat getMagValues();
 
   /* Power, Sleep, Standby */
-
   hal::status enableCycle(ICM20948_cycle cycle);
   hal::status enableLowPower(bool enLP);
   hal::status setGyrAverageInCycleMode(ICM20948_gyroAvgLowPower avg);
@@ -269,13 +252,10 @@ private:
   hal::i2c* m_i2c;
   hal::byte m_address;
   hal::byte m_gscale = 0x00;
-
   hal::byte currentBank;
-  std::array<hal::byte, 20> m_read_all_buffer{};
-  std::array<hal::byte, 6> data{};
-  xyzFloat accOffsetVal;
-  xyzFloat accCorrFactor;
-  xyzFloat gyrOffsetVal;
+  accel_read_t accOffsetVal;
+  accel_read_t accCorrFactor;
+  gyro_read_t gyrOffsetVal;
   hal::byte accRangeFactor;
   hal::byte gyrRangeFactor;
   hal::byte regVal;  // intermediate storage of register values
@@ -287,8 +267,6 @@ private:
   }
 
   hal::status setClockToAutoSelect();
-  xyzFloat correctAccRawValues(xyzFloat accRawVal);
-  xyzFloat correctGyrRawValues(xyzFloat gyrRawVal);
   hal::status switchBank(hal::byte newBank);
   hal::status writeRegister8(hal::byte bank, hal::byte reg, hal::byte val);
   hal::status writeRegister16(hal::byte bank, hal::byte reg, int16_t val);
@@ -299,7 +277,7 @@ private:
   hal::status readAllData(std::array<hal::byte, 20>& data);
   hal::status writeAK09916Register8(hal::byte reg, hal::byte val);
   hal::result<hal::byte> readAK09916Register8(hal::byte reg);
-  hal::result<hal::byte> readAK09916Register16(hal::byte reg);
+  hal::result<int16_t> readAK09916Register16(hal::byte reg);
 
   hal::status reset_ICM20948();
   hal::status enableI2CMaster();
