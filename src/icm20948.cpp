@@ -64,13 +64,6 @@ hal::status icm20948::init()
 hal::status icm20948::autoOffsets()
 {
 
-  // accOffsetVal.x = 0.0;
-  // accOffsetVal.y = 0.0;
-  // accOffsetVal.z = 0.0;
-
-  // setAccOffsets(-16330.0, 16450.0, -16600.0, 16180.0, -16520.0, 16690.0);
-  // setGyrOffsets(-115.0, 130.0, 105.0);
-
   setGyrDLPF(ICM20948_DLPF_6);           // lowest noise
   setGyrRange(ICM20948_GYRO_RANGE_250);  // highest resolution
   setAccRange(ICM20948_ACC_RANGE_2G);
@@ -78,15 +71,6 @@ hal::status icm20948::autoOffsets()
   setTempDLPF(ICM20948_DLPF_6);
 
   setMagOpMode(AK09916_CONT_MODE_20HZ);  // For Mag
-
-  // accOffsetVal.x /= 50;
-  // accOffsetVal.y /= 50;
-  // accOffsetVal.z /= 50;
-  // accOffsetVal.z -= 16384.0;
-
-  // gyrOffsetVal.x /= 50;
-  // gyrOffsetVal.y /= 50;
-  // gyrOffsetVal.z /= 50;
 
   return hal::success();
 }
@@ -423,11 +407,6 @@ hal::status icm20948::readAllData(std::array<hal::byte, 20>& data)
 hal::status icm20948::writeAK09916Register8(hal::byte reg, hal::byte val)
 {
 
-  // HAL_CHECK(hal::write(*m_i2c,
-  //                   m_address,
-  //                   std::array<hal::byte, 3>{ reg, MSByte, LSByte},
-  //                   hal::never_timeout()));
-
   writeRegister8(3, ICM20948_I2C_SLV0_ADDR, AK09916_ADDRESS);  // write AK09916
   writeRegister8(
     3, ICM20948_I2C_SLV0_REG, reg);  // define AK09916 register to be written to
@@ -478,12 +457,6 @@ hal::status icm20948::enableMagDataRead(hal::byte reg, hal::byte bytes)
     3, ICM20948_I2C_SLV0_REG, reg));  // define AK09916 register to be read
   HAL_CHECK(writeRegister8(
     3, ICM20948_I2C_SLV0_CTRL, 0x80 | bytes));  // enable read | number of byte
-
-  // switchBank(3);
-  // HAL_CHECK(hal::write(*m_i2c,
-  //                     AK09916_ADDRESS,
-  //                     std::array<hal::byte, 2>{ reg, bytes },
-  //                     hal::never_timeout()));
 
   return hal::success();
 }

@@ -35,19 +35,6 @@ hal::status application(hardware_map& p_map)
   (void)hal::delay(clock, 100ms);
 
 
-  // HAL_CHECK(icm_device.initMagnetometer());
-  // (void)hal::delay(clock, 100ms);
-  // auto mag_check = HAL_CHECK(icm_device.whoAmIMag());
-
-  // if (mag_check != 0x09) {
-  //   hal::print(console, "Magnetometer does not respond");
-  //   hal::print<32>(console, "\nwho am I: %d", mag_check);
-  // } else {
-  //   hal::print(console, "Magnetometer is connected");
-  //   hal::print<32>(console, "\nwho am I: %x", mag_check);
-  // }
-
-
   while (true) {
     hal::print(console, "\n\n================Reading IMU================\n");
 
@@ -58,8 +45,6 @@ hal::status application(hardware_map& p_map)
     (void)hal::delay(clock, 10ms);
     auto temp = HAL_CHECK(icm_device.read_temperature());
     (void)hal::delay(clock, 10ms);
-    // auto mag = HAL_CHECK(icm_device.read_magnetometer());
-    // (void)hal::delay(clock, 10ms);
 
 
     hal::print<128>(console,
@@ -76,15 +61,6 @@ hal::status application(hardware_map& p_map)
                     gyro.z);
 
     hal::print<128>(console, "\n\nCurrent Temperature: %f°C", temp.temp);
-
-    // hal::print<128>(console,
-    //                 "\n\nMag Values:        x = %f,  y = %f,  z = %f",
-    //                 mag.x,
-    //                 mag.y,
-    //                 mag.z);
-
-
-
 
     hal::print(console, "\n\n===========================================\n");
   }
