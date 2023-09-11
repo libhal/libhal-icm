@@ -18,10 +18,10 @@ project(libhal-icm VERSION 0.0.1 LANGUAGES CXX)
 
 find_package(libhal REQUIRED CONFIG)
 find_package(libhal-util REQUIRED CONFIG)
+find_package(ring-span-lite REQUIRED CONFIG)
 
 add_library(libhal-icm 
-            src/icm20948.cpp
-            src/xyzFloat.cpp)
+            src/icm20948.cpp)
 
 target_include_directories(libhal-icm PUBLIC include)
 target_compile_features(libhal-icm PRIVATE cxx_std_20)

@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include <libhal-icm/xyzFloat.hpp>
 #include <libhal/i2c.hpp>
 #include <libhal/timeout.hpp>
 #include <libhal/units.hpp>
@@ -25,9 +24,64 @@ class icm20948
 {
 
 public:
+  struct accel_read_t
+  {
+    float x;
+    float y;
+    float z;
+  };
 
-  static result<icm20948> create(hal::i2c& p_i2c,
-                                  hal::byte p_device_address);
+  struct gyro_read_t
+  {
+    float x;
+    float y;
+    float z;
+  };
+
+  struct mag_read_t
+  {
+    float x;
+    float y;
+    float z;
+  };
+
+  struct temp_read_t
+  {
+    float temp;
+  };
+
+
+  /**
+   * @brief Read acceleration data from out_x_msb_r, out_x_lsb_r,
+   *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
+   *        and perform acceleration conversion to g.
+   */
+  [[nodiscard]] hal::result<accel_read_t> read_acceleration();
+
+  /**
+   * @brief Read gyroscope data from out_x_msb_r, out_x_lsb_r,
+   *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
+   *        and perform gyroscope conversion to rad/s.
+   */
+  [[nodiscard]] hal::result<gyro_read_t> read_gyroscope();
+
+  /**
+   * @brief Read magnetometer data from out_x_msb_r, out_x_lsb_r,
+   *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
+   *        and perform magnetometer conversion to uT.
+   */
+  [[nodiscard]] hal::result<mag_read_t> read_magnetometer();
+
+
+  /**
+   * @brief Read pressure data from out_t_msb_r and out_t_lsb_r
+   *        and perform temperature conversion to celsius.
+   */
+  [[nodiscard]] hal::result<temp_read_t> read_temperature();
+
+
+
+  static result<icm20948> create(hal::i2c& p_i2c, hal::byte p_device_address);
 
   typedef enum ICM20948_CYCLE
   {
@@ -148,19 +202,17 @@ public:
   hal::status defaultSetup();
   hal::status autoOffsets();
   hal::status setAccOffsets(float xMin,
-                     float xMax,
-                     float yMin,
-                     float yMax,
-                     float zMin,
-                     float zMax);
+                            float xMax,
+                            float yMin,
+                            float yMax,
+                            float zMin,
+                            float zMax);
   hal::status setGyrOffsets(float xOffset, float yOffset, float zOffset);
   hal::result<hal::byte> whoAmI();
 
-//Delete Later
+  // Delete Later
   hal::result<hal::byte> sleep_check();
   hal::result<hal::byte> accel_check();
-
-
 
   hal::status enableAcc(bool enAcc);
   hal::status setAccRange(ICM20948_accRange accRange);
@@ -172,25 +224,9 @@ public:
   hal::status setGyrSampleRateDivider(hal::byte gyrSplRateDiv);
   hal::status setTempDLPF(ICM20948_dlpf dlpf);
 
-  /* x,y,z results */
-
   hal::status readSensor();
-  xyzFloat getAccRawValues();
-  xyzFloat getCorrectedAccRawValues();
-  xyzFloat getGValues();
-  xyzFloat getAccRawValuesFromFifo();
-  xyzFloat getCorrectedAccRawValuesFromFifo();
-  xyzFloat getGValuesFromFifo();
-  float getResultantG(xyzFloat gVal);
-  float getTemperature();
-  xyzFloat getGyrRawValues();
-  xyzFloat getCorrectedGyrRawValues();
-  xyzFloat getGyrValues();
-  xyzFloat getGyrValuesFromFifo();
-  xyzFloat getMagValues();
 
   /* Power, Sleep, Standby */
-
   hal::status enableCycle(ICM20948_cycle cycle);
   hal::status enableLowPower(bool enLP);
   hal::status setGyrAverageInCycleMode(ICM20948_gyroAvgLowPower avg);
@@ -216,12 +252,10 @@ private:
   hal::i2c* m_i2c;
   hal::byte m_address;
   hal::byte m_gscale = 0x00;
-
   hal::byte currentBank;
-  std::array<hal::byte, 20> m_read_all_buffer {};
-  xyzFloat accOffsetVal;
-  xyzFloat accCorrFactor;
-  xyzFloat gyrOffsetVal;
+  accel_read_t accOffsetVal;
+  accel_read_t accCorrFactor;
+  gyro_read_t gyrOffsetVal;
   hal::byte accRangeFactor;
   hal::byte gyrRangeFactor;
   hal::byte regVal;  // intermediate storage of register values
@@ -231,10 +265,8 @@ private:
     , m_address(p_device_address)
   {
   }
-  
+
   hal::status setClockToAutoSelect();
-  xyzFloat correctAccRawValues(xyzFloat accRawVal);
-  xyzFloat correctGyrRawValues(xyzFloat gyrRawVal);
   hal::status switchBank(hal::byte newBank);
   hal::status writeRegister8(hal::byte bank, hal::byte reg, hal::byte val);
   hal::status writeRegister16(hal::byte bank, hal::byte reg, int16_t val);
@@ -245,7 +277,7 @@ private:
   hal::status readAllData(std::array<hal::byte, 20>& data);
   hal::status writeAK09916Register8(hal::byte reg, hal::byte val);
   hal::result<hal::byte> readAK09916Register8(hal::byte reg);
-  hal::result<hal::byte> readAK09916Register16(hal::byte reg);
+  hal::result<int16_t> readAK09916Register16(hal::byte reg);
 
   hal::status reset_ICM20948();
   hal::status enableI2CMaster();

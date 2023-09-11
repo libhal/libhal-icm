@@ -50,7 +50,7 @@ foreach(demo IN LISTS DEMOS)
     target_include_directories(${current_project} PUBLIC .)
     target_compile_features(${current_project} PRIVATE cxx_std_20)
     target_link_options(${current_project} PRIVATE
-            -u_printf_float)
+        --oslib=semihost --crt0=minimal)
     target_link_libraries(${current_project} PRIVATE
         libhal::${platform_library}
         libhal::icm
