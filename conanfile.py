@@ -63,7 +63,7 @@ class libhal_icm_conan(ConanFile):
         self.test_requires("boost-ext-ut/1.1.9")
 
     def requirements(self):
-        self.requires("libhal/[^2.1.3]")
+        self.requires("libhal/[^2.0.1]")
         self.requires("ring-span-lite/[^0.6.0]")
         self.requires("libhal-util/[^3.0.0]")
 
