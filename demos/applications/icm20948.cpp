@@ -14,7 +14,6 @@
 
 #include "../hardware_map.hpp"
 #include <libhal-icm/icm20948.hpp>
-#include <libhal-icm/xyzFloat.hpp>
 #include <libhal-util/serial.hpp>
 #include <libhal-util/steady_clock.hpp>
 
@@ -31,7 +30,7 @@ hal::status application(hardware_map& p_map)
   (void)hal::delay(clock, 200ms);
   auto icm_device = HAL_CHECK(hal::icm::icm20948::create(i2c, 0x69));
   (void)hal::delay(clock, 200ms);
-  icm_device.autoOffsets();
+  icm_device.auto_offsets();
   (void)hal::delay(clock, 100ms);
 
 
