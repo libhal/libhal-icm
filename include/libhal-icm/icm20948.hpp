@@ -24,121 +24,118 @@ class icm20948
 {
 
 public:
-
-typedef enum ICM20948_CYCLE
+  enum class cycle : hal::byte
   {
-    ICM20948_NO_CYCLE = 0x00,
-    ICM20948_GYR_CYCLE = 0x10,
-    ICM20948_ACC_CYCLE = 0x20,
-    ICM20948_ACC_GYR_CYCLE = 0x30,
-    ICM20948_ACC_GYR_I2C_MST_CYCLE = 0x70
-  } ICM20948_cycle;
+    no_cycle = 0x00,
+    gyro_cycle = 0x10,
+    acc_cycle = 0x20,
+    acc_gyro_cycle = 0x30,
+    acc_gyro_i2c_mst_cycle = 0x70
+  };
 
-  typedef enum ICM20948_INT_PIN_POL
+  enum class int_pin_pol : hal::byte
   {
-    ICM20948_ACT_HIGH,
-    ICM20948_ACT_LOW
-  } ICM20948_intPinPol;
+    act_high,
+    act_low
+  };
 
-  typedef enum ICM20948_INT_TYPE
+  enum class int_type : hal::byte
   {
-    ICM20948_FSYNC_INT = 0x01,
-    ICM20948_WOM_INT = 0x02,
-    ICM20948_DMP_INT = 0x04,
-    ICM20948_DATA_READY_INT = 0x08,
-    ICM20948_FIFO_OVF_INT = 0x10,
-    ICM20948_FIFO_WM_INT = 0x20
-  } ICM20948_intType;
+    fsync_int = 0x01,
+    wom_int = 0x02,
+    dmp_int = 0x04,
+    data_ready_int = 0x08,
+    fifo_ovf_int = 0x10,
+    fifo_wm_int = 0x20
+  };
 
-  typedef enum ICM20948_FIFO_TYPE
+  enum class fifo_type : hal::byte
   {
-    ICM20948_FIFO_ACC = 0x10,
-    ICM20948_FIFO_GYR = 0x0E,
-    ICM20948_FIFO_ACC_GYR = 0x1E
-  } ICM20948_fifoType;
+    fifo_acc = 0x10,
+    fifo_gyr = 0x0E,
+    fifo_acc_gyr = 0x1E
+  };
 
-  typedef enum ICM20948_FIFO_MODE_CHOICE
+  enum fifo_mode_choice : hal::byte
   {
-    ICM20948_CONTINUOUS,
-    ICM20948_STOP_WHEN_FULL
-  } ICM20948_fifoMode;
+    continuous,
+    stop_when_full
+  };
 
-  typedef enum ICM20948_GYRO_RANGE
+  enum gyro_range : hal::byte
   {
-    ICM20948_GYRO_RANGE_250,
-    ICM20948_GYRO_RANGE_500,
-    ICM20948_GYRO_RANGE_1000,
-    ICM20948_GYRO_RANGE_2000
-  } ICM20948_gyroRange;
+    gyro_range_250,
+    gyro_range_500,
+    gyro_range_1000,
+    gyro_range_2000
+  };
 
-  typedef enum ICM20948_DLPF
+  enum digital_lowpass_filter : hal::byte
   {
-    ICM20948_DLPF_0,
-    ICM20948_DLPF_1,
-    ICM20948_DLPF_2,
-    ICM20948_DLPF_3,
-    ICM20948_DLPF_4,
-    ICM20948_DLPF_5,
-    ICM20948_DLPF_6,
-    ICM20948_DLPF_7,
-    ICM20948_DLPF_OFF
-  } ICM20948_dlpf;
+    dlpf_0,
+    dlpf_1,
+    dlpf_2,
+    dlpf_3,
+    dlpf_4,
+    dlpf_5,
+    dlpf_6,
+    dlpf_7,
+    dlpf_off
+  };
 
-  typedef enum ICM20948_GYRO_AVG_LOW_PWR
+  enum gyro_avg_low_power : hal::byte
   {
-    ICM20948_GYR_AVG_1,
-    ICM20948_GYR_AVG_2,
-    ICM20948_GYR_AVG_4,
-    ICM20948_GYR_AVG_8,
-    ICM20948_GYR_AVG_16,
-    ICM20948_GYR_AVG_32,
-    ICM20948_GYR_AVG_64,
-    ICM20948_GYR_AVG_128
-  } ICM20948_gyroAvgLowPower;
+    gyro_avg_1,
+    gyro_avg_2,
+    gyro_avg_4,
+    gyro_avg_8,
+    gyro_avg_16,
+    gyro_avg_32,
+    gyro_avg_64,
+    gyro_avg_128
+  };
 
-  typedef enum ICM20948_ACC_RANGE
+  enum acc_range : hal::byte
   {
-    ICM20948_ACC_RANGE_2G,
-    ICM20948_ACC_RANGE_4G,
-    ICM20948_ACC_RANGE_8G,
-    ICM20948_ACC_RANGE_16G
-  } ICM20948_accRange;
+    acc_range_2g,
+    acc_range_4g,
+    acc_range_8g,
+    acc_range_16g
+  };
 
-  typedef enum ICM20948_ACC_AVG_LOW_PWR
+  enum acc_avg_low_power : hal::byte
   {
-    ICM20948_ACC_AVG_4,
-    ICM20948_ACC_AVG_8,
-    ICM20948_ACC_AVG_16,
-    ICM20948_ACC_AVG_32
-  } ICM20948_accAvgLowPower;
+    acc_avg_4,
+    acc_avg_8,
+    acc_avg_16,
+    acc_avg_32
+  };
 
-  typedef enum ICM20948_WOM_COMP
+  enum wom_comp : hal::byte
   {
-    ICM20948_WOM_COMP_DISABLE,
-    ICM20948_WOM_COMP_ENABLE
-  } ICM20948_womCompEn;
+    wom_comp_disable,
+    wom_comp_enable
+  };
 
-  typedef enum AK09916_OP_MODE
+  enum ak09916_op_mode : hal::byte
   {
-    AK09916_PWR_DOWN = 0x00,
-    AK09916_TRIGGER_MODE = 0x01,
-    AK09916_CONT_MODE_10HZ = 0x02,
-    AK09916_CONT_MODE_20HZ = 0x04,
-    AK09916_CONT_MODE_50HZ = 0x06,
-    AK09916_CONT_MODE_100HZ = 0x08
-  } AK09916_opMode;
+    ak09916_pwr_down = 0x00,
+    ak09916_trigger_mode = 0x01,
+    ak09916_cont_mode_10hz = 0x02,
+    ak09916_cont_mode_20hz = 0x04,
+    ak09916_cont_mode_50hz = 0x06,
+    ak09916_cont_mode_100hz = 0x08
+  };
 
-  typedef enum ICM20948_ORIENTATION
+  enum orientation : hal::byte
   {
-    ICM20948_FLAT,
-    ICM20948_FLAT_1,
-    ICM20948_XY,
-    ICM20948_XY_1,
-    ICM20948_YX,
-    ICM20948_YX_1
-  } ICM20948_orientation;
-
-
+    flat,
+    flat_1,
+    xy,
+    xy_1,
+    yx,
+    yx_1
+  };
 
   struct accel_read_t
   {
@@ -166,6 +163,33 @@ typedef enum ICM20948_CYCLE
     float temp;
   };
 
+  /*
+   * Struct to define acceleration offsets. All units are in G's
+   * This struct can be instantiated and passed as a
+   *   parameter to icm20948::set_acceleration_offsets
+   */
+  struct acceleration_offset_t
+  {
+    float xmin;
+    float xmax;
+    float ymin;
+    float ymax;
+    float zmin;
+    float zmax;
+  };
+
+  /*
+   * Struct to define gyroscope offsets. All units are in degrees/second
+   * This struct can be instantiated and passed as a
+   *   parameter to icm20948::set_gyro_offsets
+   */
+  struct gyro_offset_t
+  {
+    float x_offset;
+    float y_offset;
+    float z_offset;
+  };
+
   /**
    * @brief Read acceleration data from out_x_msb_r, out_x_lsb_r,
    *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
@@ -187,85 +211,102 @@ typedef enum ICM20948_CYCLE
    */
   [[nodiscard]] hal::result<mag_read_t> read_magnetometer();
 
-
   /**
    * @brief Read pressure data from out_t_msb_r and out_t_lsb_r
    *        and perform temperature conversion to celsius.
    */
   [[nodiscard]] hal::result<temp_read_t> read_temperature();
 
-
-
-  [[nodiscard]] static result<icm20948> create(hal::i2c& p_i2c, hal::byte p_device_address);
+  [[nodiscard]] static result<icm20948> create(hal::i2c& p_i2c);
 
   hal::status init();
+
   hal::status auto_offsets();
-  hal::status set_acc_offsets(float p_xMin,
-                            float p_xMax,
-                            float p_yMin,
-                            float p_yMax,
-                            float p_zMin,
-                            float p_zMax);
-  hal::status set_gyr_offsets(float p_xOffset, float p_yOffset, float p_zOffset);
+
+  /**
+   * @brief Set default acceleration offsets
+   *    All offset parameters are in 'g's
+   * @param acc_offsets Acceleration offset struct.
+   */
+  hal::status set_acceleration_offsets(
+    const acceleration_offset_t& acc_offsets);
+
+  /**
+   * @brief Set default gyroscope offsets
+   *    All offset parameters are in degrees/second
+   * @param gyro_offsets Gyro offset struct.
+   */
+  hal::status set_gyro_offsets(const gyro_offset_t& gyro_offsets);
+
+  /**
+   * @brief Read & return whoami register value
+   */
   hal::result<hal::byte> whoami();
 
-  hal::status enable_acc(bool p_enAcc);
-  hal::status set_acc_range(ICM20948_accRange p_accRange);
-  hal::status set_acc_DLPF(ICM20948_dlpf p_dlpf);
-  hal::status set_acc_sample_rate_div(uint16_t p_accSplRateDiv);
+  hal::status enable_acc(bool p_en_acc);
+  hal::status set_acc_range(acc_range p_acc_range);
+  hal::status set_acc_dlpf(digital_lowpass_filter p_dlpf);
+  hal::status set_acc_sample_rate_div(uint16_t p_acc_spl_rate_div);
   hal::status enable_gyr(bool p_enGyr);
-  hal::status set_gyr_range(ICM20948_gyroRange gyroRange);
-  hal::status set_gyr_DLPF(ICM20948_dlpf p_dlpf);
-  hal::status set_gyr_sample_rate_div(hal::byte p_gyrSplRateDiv);
-  hal::status set_temp_DLPF(ICM20948_dlpf p_dlpf);
+  hal::status set_gyro_range(gyro_range gyroRange);
+  hal::status set_gyro_dlpf(digital_lowpass_filter p_dlpf);
+  hal::status set_gyro_sample_rate_div(hal::byte p_gyro_spl_rate_div);
+  hal::status set_temp_dlpf(digital_lowpass_filter p_dlpf);
 
   /* Power, Sleep, Standby */
-  hal::status enable_cycle(ICM20948_cycle p_cycle);
-  hal::status enable_low_power(bool p_enLP);
-  hal::status set_gyr_Averg_cycle_mode(ICM20948_gyroAvgLowPower p_avg);
-  hal::status set_acc_Averg_cycle_mode(ICM20948_accAvgLowPower p_avg);
+  hal::status enable_cycle(cycle p_cycle);
+  hal::status enable_low_power(bool p_enable_low_power);
+  hal::status set_gyro_averg_cycle_mode(gyro_avg_low_power p_avg);
+  hal::status set_acc_averg_cycle_mode(acc_avg_low_power p_avg);
   hal::status sleep(bool p_sleep);
 
   /* Magnetometer */
   hal::status init_mag();
-  [[nodiscard]] hal::result<hal::byte> whoami_mag();
-  void set_mag_op_mode(AK09916_opMode p_opMode);
-  void reset_mag();
+  hal::status enable_bypass_mode();
+  hal::result<hal::byte> mag_status1();
+  hal::result<hal::byte> mag_status2();
+  hal::status reset_mag();
+  hal::result<hal::byte> check_mag_mode();
+  hal::result<hal::byte> whoami_ak09916_wia1_direct();
+  hal::result<hal::byte> whoami_ak09916_wia2_direct();
+  hal::status set_mag_op_mode(ak09916_op_mode p_op_mode);
+  hal::status write_ak09916_register8(hal::byte p_reg, hal::byte p_val);
 
 private:
+  /* The I2C peripheral used for communication with the device. */
   hal::i2c* m_i2c;
-  hal::byte m_address;
-  hal::byte m_gscale = 0x00;
-  hal::byte m_currentBank;
-  accel_read_t m_accOffsetVal;
-  accel_read_t m_accCorrFactor;
-  gyro_read_t m_gyrOffsetVal;
-  hal::byte m_accRangeFactor;
-  hal::byte m_gyrRangeFactor;
-  hal::byte m_regVal;  // intermediate storage of register values
 
-  explicit icm20948(hal::i2c& p_i2c, hal::byte p_device_address)
+  hal::byte m_current_bank;
+  accel_read_t m_acc_offset_val;
+  accel_read_t m_acc_corr_factor;
+  gyro_read_t m_gyro_offset_val;
+  hal::byte m_acc_range_factor;
+  hal::byte m_gyro_range_factor;
+  hal::byte m_reg_val;  // intermediate storage of register values
+
+  /**
+   * @brief private constructor for icm20948 objects
+   * @param p_i2c The I2C peripheral used for communication with the device.
+   */
+  explicit icm20948(hal::i2c& p_i2c)
     : m_i2c(&p_i2c)
-    , m_address(p_device_address)
   {
   }
 
   hal::status set_clock_auto_select();
   hal::status switch_bank(hal::byte p_newBank);
-  hal::status write_register8(hal::byte p_bank, hal::byte p_reg, hal::byte p_val);
+  hal::status write_register8(hal::byte p_bank,
+                              hal::byte p_reg,
+                              hal::byte p_val);
   hal::status write_register16(hal::byte p_bank, hal::byte reg, int16_t p_val);
 
-  [[nodiscard]] hal::result<hal::byte> read_register8(hal::byte p_bank, hal::byte p_reg);
-  [[nodiscard]] hal::result<hal::byte> read_register16(hal::byte p_bank, hal::byte p_reg);
-
-  hal::status write_AK09916_register8(hal::byte reg, hal::byte p_val);
-  [[nodiscard]] hal::result<hal::byte> read_AK09916_register8(hal::byte p_reg);
-  [[nodiscard]] hal::result<int16_t> read_AK09916_register16(hal::byte p_reg);
+  [[nodiscard]] hal::result<hal::byte> read_register8(hal::byte p_bank,
+                                                      hal::byte p_reg);
+  [[nodiscard]] hal::result<hal::byte> read_register16(hal::byte p_bank,
+                                                       hal::byte p_reg);
+  hal::status enable_mag_data_read(hal::byte p_reg, hal::byte p_bytes);
 
   hal::status reset_icm20948();
-  hal::status enable_i2c_host();
-
-  hal::status enable_mag_data_read(hal::byte p_reg, hal::byte p_bytes);
 };
 
 }  // namespace hal::icm

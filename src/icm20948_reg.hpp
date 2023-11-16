@@ -18,137 +18,130 @@
 #include <libhal/units.hpp>
 
 namespace hal::icm {
+namespace icm20948_reg {
 
-
-static constexpr hal::byte ICM20948_ADDRESS = 0x69;
-static constexpr hal::byte AK09916_ADDRESS = 0x0C;
+static constexpr hal::byte icm20948_address = 0x69;
+static constexpr hal::byte ak09916_address = 0x0C;
 
 /* Registers ICM20948 USER BANK 0*/
-static constexpr hal::byte ICM20948_WHO_AM_I = 0x00;
-static constexpr hal::byte ICM20948_USER_CTRL = 0x03;
-static constexpr hal::byte ICM20948_LP_CONFIG = 0x05;
-static constexpr hal::byte ICM20948_PWR_MGMT_1 = 0x06;
-static constexpr hal::byte ICM20948_PWR_MGMT_2 = 0x07;
-static constexpr hal::byte ICM20948_INT_PIN_CFG = 0x0F;
-static constexpr hal::byte ICM20948_INT_ENABLE = 0x10;
-static constexpr hal::byte ICM20948_INT_ENABLE_1 = 0x11;
-static constexpr hal::byte ICM20948_INT_ENABLE_2 = 0x12;
-static constexpr hal::byte ICM20948_INT_ENABLE_3 = 0x13;
-static constexpr hal::byte ICM20948_I2C_MST_STATUS = 0x17;
-static constexpr hal::byte ICM20948_INT_STATUS = 0x19;
-static constexpr hal::byte ICM20948_INT_STATUS_1 = 0x1A;
-static constexpr hal::byte ICM20948_INT_STATUS_2 = 0x1B;
-static constexpr hal::byte ICM20948_INT_STATUS_3 = 0x1C;
-static constexpr hal::byte ICM20948_DELAY_TIME_H = 0x28;
-static constexpr hal::byte ICM20948_DELAY_TIME_L = 0x29;
-static constexpr hal::byte ICM20948_ACCEL_OUT =
-  0x2D;  // accel data registers begin
-static constexpr hal::byte ICM20948_GYRO_OUT =
-  0x33;  // gyro data registers begin
-static constexpr hal::byte ICM20948_TEMP_OUT = 0x39;
-static constexpr hal::byte ICM20948_EXT_SLV_SENS_DATA_00 = 0x3B;
-static constexpr hal::byte ICM20948_EXT_SLV_SENS_DATA_01 = 0x3C;
-static constexpr hal::byte ICM20948_FIFO_EN_1 = 0x66;
-static constexpr hal::byte ICM20948_FIFO_EN_2 = 0x67;
-static constexpr hal::byte ICM20948_FIFO_RST = 0x68;
-static constexpr hal::byte ICM20948_FIFO_MODE = 0x69;
-static constexpr hal::byte ICM20948_FIFO_COUNT = 0x70;
-static constexpr hal::byte ICM20948_FIFO_R_W = 0x72;
-static constexpr hal::byte ICM20948_DATA_RDY_STATUS = 0x74;
-static constexpr hal::byte ICM20948_FIFO_CFG = 0x76;
+constexpr hal::byte who_am_i = 0x00;
+constexpr hal::byte user_ctrl = 0x03;
+constexpr hal::byte lp_config = 0x05;
+constexpr hal::byte pwr_mgmt_1 = 0x06;
+constexpr hal::byte pwr_mgmt_2 = 0x07;
+constexpr hal::byte int_pin_cfg = 0x0F;
+constexpr hal::byte int_enable = 0x10;
+constexpr hal::byte int_enable_1 = 0x11;
+constexpr hal::byte int_enable_2 = 0x12;
+constexpr hal::byte int_enable_3 = 0x13;
+constexpr hal::byte i2c_mst_status = 0x17;
+constexpr hal::byte int_status = 0x19;
+constexpr hal::byte int_status_1 = 0x1A;
+constexpr hal::byte int_status_2 = 0x1B;
+constexpr hal::byte int_status_3 = 0x1C;
+constexpr hal::byte delay_time_h = 0x28;
+constexpr hal::byte delay_time_l = 0x29;
+constexpr hal::byte accel_out = 0x2D;  // accel data registers begin
+constexpr hal::byte gyro_out = 0x33;  // gyro data registers begin
+constexpr hal::byte temp_out = 0x39;
+constexpr hal::byte ext_slv_sens_data_00 = 0x3B;
+constexpr hal::byte ext_slv_sens_data_01 = 0x3C;
+constexpr hal::byte fifo_en_1 = 0x66;
+constexpr hal::byte fifo_en_2 = 0x67;
+constexpr hal::byte fifo_rst = 0x68;
+constexpr hal::byte fifo_mode = 0x69;
+constexpr hal::byte fifo_count = 0x70;
+constexpr hal::byte fifo_r_w = 0x72;
+constexpr hal::byte data_rdy_status = 0x74;
+constexpr hal::byte fifo_cfg = 0x76;
 
 /* Registers ICM20948 USER BANK 1*/
-static constexpr hal::byte ICM20948_SELF_TEST_X_GYRO = 0x02;
-static constexpr hal::byte ICM20948_SELF_TEST_Y_GYRO = 0x03;
-static constexpr hal::byte ICM20948_SELF_TEST_Z_GYRO = 0x04;
-static constexpr hal::byte ICM20948_SELF_TEST_X_ACCEL = 0x0E;
-static constexpr hal::byte ICM20948_SELF_TEST_Y_ACCEL = 0x0F;
-static constexpr hal::byte ICM20948_SELF_TEST_Z_ACCEL = 0x10;
-static constexpr hal::byte ICM20948_XA_OFFS_H = 0x14;
-static constexpr hal::byte ICM20948_XA_OFFS_L = 0x15;
-static constexpr hal::byte ICM20948_YA_OFFS_H = 0x17;
-static constexpr hal::byte ICM20948_YA_OFFS_L = 0x18;
-static constexpr hal::byte ICM20948_ZA_OFFS_H = 0x1A;
-static constexpr hal::byte ICM20948_ZA_OFFS_L = 0x1B;
-static constexpr hal::byte ICM20948_TIMEBASE_CORR_PLL = 0x28;
+constexpr hal::byte self_test_x_gyro = 0x02;
+constexpr hal::byte self_test_y_gyro = 0x03;
+constexpr hal::byte self_test_z_gyro = 0x04;
+constexpr hal::byte self_test_x_accel = 0x0E;
+constexpr hal::byte self_test_y_accel = 0x0F;
+constexpr hal::byte self_test_z_accel = 0x10;
+constexpr hal::byte xa_offs_h = 0x14;
+constexpr hal::byte xa_offs_l = 0x15;
+constexpr hal::byte ya_offs_h = 0x17;
+constexpr hal::byte ya_offs_l = 0x18;
+constexpr hal::byte za_offs_h = 0x1A;
+constexpr hal::byte za_offs_l = 0x1B;
+constexpr hal::byte timebase_corr_pll = 0x28;
 
 /* Registers ICM20948 USER BANK 2*/
-static constexpr hal::byte ICM20948_GYRO_SMPLRT_DIV = 0x00;
-static constexpr hal::byte ICM20948_GYRO_CONFIG_1 = 0x01;
-static constexpr hal::byte ICM20948_GYRO_CONFIG_2 = 0x02;
-static constexpr hal::byte ICM20948_XG_OFFS_USRH = 0x03;
-static constexpr hal::byte ICM20948_XG_OFFS_USRL = 0x04;
-static constexpr hal::byte ICM20948_YG_OFFS_USRH = 0x05;
-static constexpr hal::byte ICM20948_YG_OFFS_USRL = 0x06;
-static constexpr hal::byte ICM20948_ZG_OFFS_USRH = 0x07;
-static constexpr hal::byte ICM20948_ZG_OFFS_USRL = 0x08;
-static constexpr hal::byte ICM20948_ODR_ALIGN_EN = 0x09;
-static constexpr hal::byte ICM20948_ACCEL_SMPLRT_DIV_1 = 0x10;
-static constexpr hal::byte ICM20948_ACCEL_SMPLRT_DIV_2 = 0x11;
-static constexpr hal::byte ICM20948_ACCEL_INTEL_CTRL = 0x12;
-static constexpr hal::byte ICM20948_ACCEL_WOM_THR = 0x13;
-static constexpr hal::byte ICM20948_ACCEL_CONFIG = 0x14;
-static constexpr hal::byte ICM20948_ACCEL_CONFIG_2 = 0x15;
-static constexpr hal::byte ICM20948_FSYNC_CONFIG = 0x52;
-static constexpr hal::byte ICM20948_TEMP_CONFIG = 0x53;
-static constexpr hal::byte ICM20948_MOD_CTRL_USR = 0x54;
+static constexpr hal::byte gyro_smplrt_div = 0x00;
+static constexpr hal::byte gyro_config_1 = 0x01;
+static constexpr hal::byte gyro_config_2 = 0x02;
+static constexpr hal::byte xg_offs_usrh = 0x03;
+static constexpr hal::byte xg_offs_usrl = 0x04;
+static constexpr hal::byte yg_offs_usrh = 0x05;
+static constexpr hal::byte yg_offs_usrl = 0x06;
+static constexpr hal::byte zg_offs_usrh = 0x07;
+static constexpr hal::byte zg_offs_usrl = 0x08;
+static constexpr hal::byte odr_align_en = 0x09;
+static constexpr hal::byte accel_smplrt_div_1 = 0x10;
+static constexpr hal::byte accel_smplrt_div_2 = 0x11;
+static constexpr hal::byte accel_intel_ctrl = 0x12;
+static constexpr hal::byte accel_wom_thr = 0x13;
+static constexpr hal::byte accel_config = 0x14;
+static constexpr hal::byte accel_config_2 = 0x15;
+static constexpr hal::byte fsync_config = 0x52;
+static constexpr hal::byte temp_config = 0x53;
+static constexpr hal::byte mod_ctrl_usr = 0x54;
 
 /* Registers ICM20948 USER BANK 3*/
-static constexpr hal::byte ICM20948_I2C_MST_ODR_CFG = 0x00;
-static constexpr hal::byte ICM20948_I2C_MST_CTRL = 0x01;
-static constexpr hal::byte ICM20948_I2C_MST_DELAY_CTRL = 0x02;
-static constexpr hal::byte ICM20948_I2C_SLV0_ADDR = 0x03;
-static constexpr hal::byte ICM20948_I2C_SLV0_REG = 0x04;
-static constexpr hal::byte ICM20948_I2C_SLV0_CTRL = 0x05;
-static constexpr hal::byte ICM20948_I2C_SLV0_DO = 0x06;
+static constexpr hal::byte i2c_mst_odr_cfg = 0x00;
+static constexpr hal::byte i2c_mst_ctrl = 0x01;
+static constexpr hal::byte i2c_mst_delay_ctrl = 0x02;
+static constexpr hal::byte i2c_slv0_addr = 0x03;
+static constexpr hal::byte i2c_slv0_reg = 0x04;
+static constexpr hal::byte i2c_slv0_ctrl = 0x05;
+static constexpr hal::byte i2c_slv0_do = 0x06;
 
 /* Registers ICM20948 ALL BANKS */
-static constexpr hal::byte ICM20948_REG_BANK_SEL = 0x7F;
+static constexpr hal::byte reg_bank_sel = 0x7F;
 
 /* Registers AK09916 */
-static constexpr hal::byte AK09916_WIA_1 = 0x00;  // Who I am, Company ID
-static constexpr hal::byte AK09916_WIA_2 = 0x01;  // Who I am, Device ID
-static constexpr hal::byte AK09916_STATUS_1 = 0x10;
-static constexpr hal::byte AK09916_HXL = 0x11;
-static constexpr hal::byte AK09916_HXH = 0x12;
-static constexpr hal::byte AK09916_HYL = 0x13;
-static constexpr hal::byte AK09916_HYH = 0x14;
-static constexpr hal::byte AK09916_HZL = 0x15;
-static constexpr hal::byte AK09916_HZH = 0x16;
-static constexpr hal::byte AK09916_STATUS_2 = 0x18;
-static constexpr hal::byte AK09916_CNTL_2 = 0x31;
-static constexpr hal::byte AK09916_CNTL_3 = 0x32;
+static constexpr hal::byte ak09916_wia_1 = 0x00;  // Who I am, Company ID
+static constexpr hal::byte ak09916_wia_2 = 0x01;  // Who I am, Device ID
+static constexpr hal::byte ak09916_status_1 = 0x10;
+static constexpr hal::byte ak09916_hxl = 0x11;
+static constexpr hal::byte ak09916_hxh = 0x12;
+static constexpr hal::byte ak09916_hyl = 0x13;
+static constexpr hal::byte ak09916_hyh = 0x14;
+static constexpr hal::byte ak09916_hzl = 0x15;
+static constexpr hal::byte ak09916_hzh = 0x16;
+static constexpr hal::byte ak09916_status_2 = 0x18;
+static constexpr hal::byte ak09916_cntl_2 = 0x31;
+static constexpr hal::byte ak09916_cntl_3 = 0x32;
 
 /* Register Bits */
-// static constexpr hal::byte ICM20948_RESET = 0x80;
-static constexpr hal::byte ICM20948_RESET = 0x41;
+static constexpr hal::byte icm_reset = 0x41;
+static constexpr hal::byte i2c_mst_en = 0x20;
+static constexpr hal::byte icm_sleep = 0x40;
+static constexpr hal::byte lp_en = 0x20;
+static constexpr hal::byte bypass_en = 0x02;
+static constexpr hal::byte gyro_en = 0x07;
+static constexpr hal::byte acc_en = 0x38;
+static constexpr hal::byte fifo_en = 0x40;
+static constexpr hal::byte int1_actl = 0x80;
+static constexpr hal::byte int_1_latch_en = 0x20;
+static constexpr hal::byte actl_fsync = 0x08;
+static constexpr hal::byte int_anyrd_2clear = 0x10;
+static constexpr hal::byte fsync_int_mode_en = 0x06;
+static constexpr hal::byte ak09916_16_bit = 0x10;
+static constexpr hal::byte ak09916_ovf = 0x08;
+static constexpr hal::byte ak09916_read = 0x80;
 
-static constexpr hal::byte ICM20948_I2C_MST_EN = 0x20;
-static constexpr hal::byte ICM20948_SLEEP = 0x40;
-static constexpr hal::byte ICM20948_LP_EN = 0x20;
-static constexpr hal::byte ICM20948_BYPASS_EN = 0x02;
-static constexpr hal::byte ICM20948_GYR_EN = 0x07;
-static constexpr hal::byte ICM20948_ACC_EN = 0x38;
-static constexpr hal::byte ICM20948_FIFO_EN = 0x40;
-static constexpr hal::byte ICM20948_INT1_ACTL = 0x80;
-static constexpr hal::byte ICM20948_INT_1_LATCH_EN = 0x20;
-static constexpr hal::byte ICM20948_ACTL_FSYNC = 0x08;
-static constexpr hal::byte ICM20948_INT_ANYRD_2CLEAR = 0x10;
-static constexpr hal::byte ICM20948_FSYNC_INT_MODE_EN = 0x06;
-static constexpr hal::byte AK09916_16_BIT = 0x10;
-static constexpr hal::byte AK09916_OVF = 0x08;
-static constexpr hal::byte AK09916_READ = 0x80;
+static constexpr uint16_t ak09916_who_am_i_1 = 0x48;
+static constexpr uint16_t ak09916_who_am_i_2 = 0x09;
 
-/* Others */
-// static constexpr hal::byte AK09916_WHO_AM_I_1 = 0x48;
-// static constexpr hal::byte AK09916_WHO_AM_I_2 = 0x09;
-static constexpr uint16_t AK09916_WHO_AM_I_1 = 0x4809;
-static constexpr uint16_t AK09916_WHO_AM_I_2 = 0x0948;
+static constexpr hal::byte who_am_i_content = 0xEA;
+static constexpr float room_temp_offset = 0.0;
+static constexpr float t_sensitivity = 333.87;
+static constexpr float ak09916_mag_lsb = 0.1495;
 
-
-static constexpr hal::byte ICM20948_WHO_AM_I_CONTENT = 0xEA;
-static constexpr float ICM20948_ROOM_TEMP_OFFSET = 0.0;
-static constexpr float ICM20948_T_SENSITIVITY = 333.87;
-static constexpr float AK09916_MAG_LSB = 0.1495;
-
+}  // namespace icm20948
 }  // namespace hal::icm

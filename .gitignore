@@ -41,3 +41,4 @@ archives/
 # Artifacts
 build/
 CMakeUserPresets.json
+*.DS_Store
