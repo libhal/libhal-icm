@@ -58,14 +58,14 @@ class libhal_icm_conan(ConanFile):
 
     def build_requirements(self):
         self.tool_requires("cmake/3.27.1")
-        self.tool_requires("libhal-cmake-util/3.0.0")
+        self.tool_requires("libhal-cmake-util/3.0.1")
         self.test_requires("libhal-mock/[^2.0.0]")
         self.test_requires("boost-ext-ut/1.1.9")
 
     def requirements(self):
-        self.requires("libhal/[^2.0.1]")
+        self.requires("libhal/[^2.0.3]", transitive_headers=True)
         self.requires("ring-span-lite/[^0.6.0]")
-        self.requires("libhal-util/[^3.0.0]")
+        self.requires("libhal-util/[^3.0.1]")
 
     def layout(self):
         cmake_layout(self)
