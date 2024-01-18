@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Khalil Estell
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ constexpr hal::byte int_status_3 = 0x1C;
 constexpr hal::byte delay_time_h = 0x28;
 constexpr hal::byte delay_time_l = 0x29;
 constexpr hal::byte accel_out = 0x2D;  // accel data registers begin
-constexpr hal::byte gyro_out = 0x33;  // gyro data registers begin
+constexpr hal::byte gyro_out = 0x33;   // gyro data registers begin
 constexpr hal::byte temp_out = 0x39;
 constexpr hal::byte ext_slv_sens_data_00 = 0x3B;
 constexpr hal::byte ext_slv_sens_data_01 = 0x3C;
@@ -143,5 +143,5 @@ static constexpr float room_temp_offset = 0.0;
 static constexpr float t_sensitivity = 333.87;
 static constexpr float ak09916_mag_lsb = 0.1495;
 
-}  // namespace icm20948
+}  // namespace icm20948_reg
 }  // namespace hal::icm

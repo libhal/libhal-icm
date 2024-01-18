@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Khalil Estell
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -72,7 +72,8 @@ hal::status icm20948::auto_offsets()
   return hal::success();
 }
 
-hal::status icm20948::set_acceleration_offsets(const acceleration_offset_t& acc_offsets)
+hal::status icm20948::set_acceleration_offsets(
+  const acceleration_offset_t& acc_offsets)
 {
   m_acc_offset_val.x = (acc_offsets.xmax + acc_offsets.xmin) * 0.5;
   m_acc_offset_val.y = (acc_offsets.ymax + acc_offsets.ymin) * 0.5;
@@ -143,8 +144,7 @@ hal::status icm20948::set_acc_dlpf(digital_lowpass_filter p_dlpf)
 
 hal::status icm20948::set_acc_sample_rate_div(uint16_t p_acc_spl_rate_div)
 {
-  HAL_CHECK(
-    write_register16(2, accel_smplrt_div_1, p_acc_spl_rate_div));
+  HAL_CHECK(write_register16(2, accel_smplrt_div_1, p_acc_spl_rate_div));
   return hal::success();
 }
 
@@ -208,11 +208,11 @@ hal::result<icm20948::accel_read_t> icm20948::read_acceleration()
   std::array<hal::byte, 6> data{};
   accel_read_t accel_read = { 0, 0, 0 }, accel_read_raw;
   switch_bank(0);
-  data = HAL_CHECK(
-    hal::write_then_read<6>(*m_i2c,
-                            icm20948_address,
-                            std::array<hal::byte, 1>{ accel_out },
-                            hal::never_timeout()));
+  data =
+    HAL_CHECK(hal::write_then_read<6>(*m_i2c,
+                                      icm20948_address,
+                                      std::array<hal::byte, 1>{ accel_out },
+                                      hal::never_timeout()));
 
   accel_read_raw.x = static_cast<int16_t>(((data[0]) << 8) | data[1]) * 1.0;
   accel_read_raw.y = static_cast<int16_t>(((data[2]) << 8) | data[3]) * 1.0;
@@ -238,11 +238,10 @@ hal::result<icm20948::gyro_read_t> icm20948::read_gyroscope()
   gyro_read_t gyro_read = { 0, 0, 0 }, gyro_read_raw;
 
   switch_bank(0);
-  data = HAL_CHECK(
-    hal::write_then_read<6>(*m_i2c,
-                            icm20948_address,
-                            std::array<hal::byte, 1>{ gyro_out },
-                            hal::never_timeout()));
+  data = HAL_CHECK(hal::write_then_read<6>(*m_i2c,
+                                           icm20948_address,
+                                           std::array<hal::byte, 1>{ gyro_out },
+                                           hal::never_timeout()));
 
   gyro_read_raw.x = static_cast<int16_t>(((data[0]) << 8) | data[1]) * 1.0;
   gyro_read_raw.y = static_cast<int16_t>(((data[2]) << 8) | data[3]) * 1.0;
@@ -309,14 +308,12 @@ hal::result<icm20948::temp_read_t> icm20948::read_temperature()
   temp_read_t temp_read;
 
   switch_bank(0);
-  data = HAL_CHECK(
-    hal::write_then_read<2>(*m_i2c,
-                            icm20948_address,
-                            std::array<hal::byte, 1>{ temp_out },
-                            hal::never_timeout()));
+  data = HAL_CHECK(hal::write_then_read<2>(*m_i2c,
+                                           icm20948_address,
+                                           std::array<hal::byte, 1>{ temp_out },
+                                           hal::never_timeout()));
   int16_t rawTemp = static_cast<int16_t>(((data[0]) << 8) | data[1]);
-  temp_read.temp =
-    (rawTemp * 1.0 - room_temp_offset) / t_sensitivity + 21.0;
+  temp_read.temp = (rawTemp * 1.0 - room_temp_offset) / t_sensitivity + 21.0;
   return temp_read;
 }
 
@@ -488,11 +485,11 @@ hal::status icm20948::switch_bank(hal::byte p_newBank)
     m_current_bank = p_newBank;
     m_current_bank = m_current_bank << 4;
   }
-  auto reg_buffer = HAL_CHECK(
-    hal::write_then_read<1>(*m_i2c,
-                            icm20948_address,
-                            std::array<hal::byte, 1>{ reg_bank_sel },
-                            hal::never_timeout()));
+  auto reg_buffer =
+    HAL_CHECK(hal::write_then_read<1>(*m_i2c,
+                                      icm20948_address,
+                                      std::array<hal::byte, 1>{ reg_bank_sel },
+                                      hal::never_timeout()));
 
   hal::byte reg_val = reg_buffer[0];
   HAL_CHECK(hal::write(*m_i2c,
