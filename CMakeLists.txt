@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2024 Khalil Estell
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ find_package(libhal REQUIRED CONFIG)
 find_package(libhal-util REQUIRED CONFIG)
 find_package(ring-span-lite REQUIRED CONFIG)
 
-add_library(libhal-icm 
+add_library(libhal-icm
             src/icm20948.cpp)
 
 target_include_directories(libhal-icm PUBLIC include)
