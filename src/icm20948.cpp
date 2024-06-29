@@ -73,7 +73,7 @@ hal::status icm20948::auto_offsets()
 }
 
 hal::status icm20948::set_acceleration_offsets(
-  const acceleration_offset_t& acc_offsets)
+  acceleration_offset_t const& acc_offsets)
 {
   m_acc_offset_val.x = (acc_offsets.xmax + acc_offsets.xmin) * 0.5;
   m_acc_offset_val.y = (acc_offsets.ymax + acc_offsets.ymin) * 0.5;
@@ -85,7 +85,7 @@ hal::status icm20948::set_acceleration_offsets(
   return hal::success();
 }
 
-hal::status icm20948::set_gyro_offsets(const gyro_offset_t& gyr_offsets)
+hal::status icm20948::set_gyro_offsets(gyro_offset_t const& gyr_offsets)
 {
   m_gyro_offset_val.x = gyr_offsets.x_offset;
   m_gyro_offset_val.y = gyr_offsets.y_offset;
@@ -263,7 +263,7 @@ hal::result<icm20948::mag_read_t> icm20948::read_magnetometer()
   mag_read_t mag_read;
 
   int polling_attempts = 0;
-  const int max_polling_attempts = 1000;
+  int const max_polling_attempts = 1000;
 
   while (true) {
     auto status = HAL_CHECK(
