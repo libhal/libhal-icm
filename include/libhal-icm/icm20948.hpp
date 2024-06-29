@@ -229,14 +229,14 @@ public:
    * @param acc_offsets Acceleration offset struct.
    */
   hal::status set_acceleration_offsets(
-    const acceleration_offset_t& acc_offsets);
+    acceleration_offset_t const& acc_offsets);
 
   /**
    * @brief Set default gyroscope offsets
    *    All offset parameters are in degrees/second
    * @param gyro_offsets Gyro offset struct.
    */
-  hal::status set_gyro_offsets(const gyro_offset_t& gyro_offsets);
+  hal::status set_gyro_offsets(gyro_offset_t const& gyro_offsets);
 
   /**
    * @brief Read & return whoami register value
